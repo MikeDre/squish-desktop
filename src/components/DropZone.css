@@ -1,0 +1,33 @@
+.dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+  margin: 16px;
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  background: #fafafa;
+  transition: all 0.2s ease;
+  cursor: default;
+  user-select: none;
+}
+
+.dropzone--drag-over {
+  border-color: #4a90d9;
+  background: #eef4fc;
+}
+
+.dropzone--processing {
+  opacity: 0.6;
+}
+
+.dropzone__content {
+  text-align: center;
+  padding: 24px;
+}
+
+.dropzone__text {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
