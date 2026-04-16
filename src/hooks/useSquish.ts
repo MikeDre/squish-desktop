@@ -18,32 +18,39 @@ export function useSquish(
   settingsRef.current = settings;
 
   useEffect(() => {
+    let cancelled = false;
     const unlisteners: Array<() => void> = [];
 
     async function setup() {
       const u1 = await listen<FileStartPayload>("squish://file-start", (event) => {
-        dispatch({ type: "FILE_START", payload: event.payload });
+        if (!cancelled) dispatch({ type: "FILE_START", payload: event.payload });
       });
+      if (cancelled) { u1(); return; }
       unlisteners.push(u1);
 
       const u2 = await listen<FileDonePayload>("squish://file-done", (event) => {
-        dispatch({ type: "FILE_DONE", payload: event.payload });
+        if (!cancelled) dispatch({ type: "FILE_DONE", payload: event.payload });
       });
+      if (cancelled) { u2(); return; }
       unlisteners.push(u2);
 
       const u3 = await listen<FileErrorPayload>("squish://file-error", (event) => {
-        dispatch({
-          type: "FILE_ERROR",
-          id: event.payload.id,
-          error: event.payload.error,
-        });
+        if (!cancelled) {
+          dispatch({
+            type: "FILE_ERROR",
+            id: event.payload.id,
+            error: event.payload.error,
+          });
+        }
       });
+      if (cancelled) { u3(); return; }
       unlisteners.push(u3);
     }
 
     setup();
 
     return () => {
+      cancelled = true;
       unlisteners.forEach((fn) => fn());
     };
   }, [dispatch]);
