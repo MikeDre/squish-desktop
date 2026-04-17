@@ -52,4 +52,23 @@ describe("FileRow", () => {
     render(<FileRow file={error} />);
     expect(screen.getByText(/decode failed/)).toBeInTheDocument();
   });
+
+  it("shows reveal button when done", () => {
+    const doneWithPath: FileEntry = {
+      ...done,
+      outputPath: "/tmp/photo_squished.png",
+    };
+    render(<FileRow file={doneWithPath} />);
+    expect(screen.getByRole("button", { name: /show in finder/i })).toBeInTheDocument();
+  });
+
+  it("does not show reveal button when compressing", () => {
+    render(<FileRow file={compressing} />);
+    expect(screen.queryByRole("button", { name: /show in finder/i })).not.toBeInTheDocument();
+  });
+
+  it("does not show reveal button when error", () => {
+    render(<FileRow file={error} />);
+    expect(screen.queryByRole("button", { name: /show in finder/i })).not.toBeInTheDocument();
+  });
 });

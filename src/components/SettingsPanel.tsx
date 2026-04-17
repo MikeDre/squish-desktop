@@ -19,7 +19,12 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
         aria-label="Settings"
         title="Settings"
       >
-        {expanded ? "▾ Settings" : "⚙ Settings"}
+        <span
+          className={`settings-panel__toggle-icon${expanded ? " settings-panel__toggle-icon--open" : ""}`}
+        >
+          ⚙
+        </span>
+        Settings
       </button>
 
       {expanded && (
@@ -74,14 +79,26 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
           </div>
 
           <div className="settings-panel__field">
-            <label>
+            <label className="settings-panel__checkbox-label">
               <input
                 type="checkbox"
                 checked={settings.lossless}
                 onChange={(e) => onChange({ lossless: e.target.checked })}
                 aria-label="Lossless"
               />
-              {" "}Lossless compression
+              Lossless compression
+            </label>
+          </div>
+
+          <div className="settings-panel__field">
+            <label className="settings-panel__checkbox-label">
+              <input
+                type="checkbox"
+                checked={settings.recursive}
+                onChange={(e) => onChange({ recursive: e.target.checked })}
+                aria-label="Include subfolders"
+              />
+              Include subfolders
             </label>
           </div>
         </div>

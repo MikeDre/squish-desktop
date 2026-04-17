@@ -1,3 +1,4 @@
+import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import type { FileEntry } from "../types";
 import "./FileRow.css";
 
@@ -12,8 +13,19 @@ function formatBytes(bytes: number): string {
 }
 
 export function FileRow({ file }: FileRowProps) {
+  const handleReveal = async () => {
+    if (file.outputPath) {
+      try {
+        await revealItemInDir(file.outputPath);
+      } catch {
+        // Opener failed — no-op.
+      }
+    }
+  };
+
   return (
     <div className={`file-row file-row--${file.status}`}>
+      <div className="file-row__status-dot" />
       <div className="file-row__name">{file.filename}</div>
 
       {(file.status === "pending" || file.status === "compressing") && (
@@ -38,6 +50,16 @@ export function FileRow({ file }: FileRowProps) {
               ? `-${file.reductionPercent.toFixed(1)}%`
               : `+${Math.abs(file.reductionPercent ?? 0).toFixed(1)}%`}
           </span>
+          {file.outputPath && (
+            <button
+              className="file-row__reveal-btn"
+              onClick={handleReveal}
+              aria-label="Show in Finder"
+              title="Show in Finder"
+            >
+              ↗
+            </button>
+          )}
         </div>
       )}
 

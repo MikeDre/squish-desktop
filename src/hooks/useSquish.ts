@@ -64,6 +64,7 @@ export function useSquish(
             quality: settingsRef.current.quality,
             lossless: settingsRef.current.lossless,
             format: settingsRef.current.format,
+            recursive: settingsRef.current.recursive,
           },
         });
         dispatch({ type: "BATCH_COMPLETE" });

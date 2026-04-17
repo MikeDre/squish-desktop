@@ -15,7 +15,7 @@ describe("useSquish", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     dispatch = vi.fn() as unknown as React.Dispatch<AppAction>;
-    settings = { quality: null, lossless: false, format: null };
+    settings = { quality: null, lossless: false, format: null, recursive: false };
 
     // Default: listen returns an unlisten function.
     mockListen.mockResolvedValue(() => {});
@@ -52,7 +52,7 @@ describe("useSquish", () => {
 
     expect(mockInvoke).toHaveBeenCalledWith("squish_files", {
       paths: ["/tmp/a.png"],
-      options: { quality: null, lossless: false, format: null },
+      options: { quality: null, lossless: false, format: null, recursive: false },
     });
   });
 });

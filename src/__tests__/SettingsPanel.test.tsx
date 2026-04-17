@@ -40,4 +40,24 @@ describe("SettingsPanel", () => {
     await user.click(screen.getByLabelText(/lossless/i));
     expect(onChange).toHaveBeenCalledWith({ lossless: true });
   });
+
+  it("shows recursive toggle when expanded", async () => {
+    const user = userEvent.setup();
+    render(
+      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />
+    );
+    await user.click(screen.getByRole("button", { name: /settings/i }));
+    expect(screen.getByLabelText(/include subfolders/i)).toBeInTheDocument();
+  });
+
+  it("calls onChange when recursive is toggled", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={onChange} />
+    );
+    await user.click(screen.getByRole("button", { name: /settings/i }));
+    await user.click(screen.getByLabelText(/include subfolders/i));
+    expect(onChange).toHaveBeenCalledWith({ recursive: true });
+  });
 });
