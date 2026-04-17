@@ -14,3 +14,11 @@ vi.mock("@tauri-apps/api/webviewWindow", () => ({
     onDragDropEvent: vi.fn(() => Promise.resolve(() => {})),
   })),
 }));
+
+vi.mock("@tauri-apps/plugin-dialog", () => ({
+  open: vi.fn(() => Promise.resolve(null)),
+}));
+
+vi.mock("@tauri-apps/plugin-opener", () => ({
+  revealItemInDir: vi.fn(() => Promise.resolve()),
+}));
