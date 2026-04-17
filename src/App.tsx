@@ -3,6 +3,7 @@ import { DropZone } from "./components/DropZone";
 import { FileList } from "./components/FileList";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { useSquish } from "./hooks/useSquish";
+import { useTheme } from "./hooks/useTheme";
 import type {
   AppState,
   AppAction,
@@ -50,12 +51,15 @@ export function initialState(): AppState {
 
 export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
-    case "START_BATCH":
+    case "START_BATCH": {
+      const isActive = state.status === "processing";
       return {
         ...state,
         status: "processing",
-        files: [],
+        files: isActive ? state.files : [],
+        activeBatches: state.activeBatches + 1,
       };
+    }
 
     case "FILE_START":
       return {
@@ -97,8 +101,14 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         ),
       };
 
-    case "BATCH_COMPLETE":
-      return { ...state, status: "done" };
+    case "BATCH_COMPLETE": {
+      const remaining = state.activeBatches - 1;
+      return {
+        ...state,
+        status: remaining <= 0 ? "done" : "processing",
+        activeBatches: Math.max(0, remaining),
+      };
+    }
 
     case "UPDATE_SETTINGS": {
       const newSettings = { ...state.settings, ...action.settings };
@@ -115,16 +125,15 @@ function App() {
   const [state, dispatch] = useReducer(appReducer, undefined, initialState);
   const [batchResult, setBatchResult] = useState<BatchResult | null>(null);
   const { squishFiles } = useSquish(dispatch, state.settings);
+  const { effectiveTheme, cycleTheme, theme } = useTheme();
 
   const handleDrop = useCallback(
     async (paths: string[]) => {
-      if (state.status === "processing") return;
-
-      setBatchResult(null);
+      if (state.status !== "processing") {
+        setBatchResult(null);
+      }
       dispatch({ type: "START_BATCH" });
 
-      // Rust side expands directories, emits file-start events (which add rows),
-      // then processes files and emits file-done/file-error events.
       const result = await squishFiles(paths);
       if (result) {
         setBatchResult(result);
@@ -139,6 +148,16 @@ function App() {
 
   return (
     <div className="app">
+      <div className="app__header">
+        <button
+          className="theme-toggle"
+          onClick={cycleTheme}
+          aria-label={`Theme: ${theme}`}
+          title={`Theme: ${theme} (${effectiveTheme})`}
+        >
+          {effectiveTheme === "dark" ? "☀" : "☾"}
+        </button>
+      </div>
       <DropZone status={state.status} onDrop={handleDrop} />
       <SettingsPanel settings={state.settings} onChange={handleSettingsChange} />
       <FileList files={state.files} batchResult={batchResult} />

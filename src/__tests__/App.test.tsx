@@ -84,6 +84,62 @@ describe("appReducer", () => {
     expect(state.status).toBe("done");
   });
 
+  it("START_BATCH increments activeBatches", () => {
+    const state = appReducer(initialState(), { type: "START_BATCH" });
+    expect(state.activeBatches).toBe(1);
+  });
+
+  it("START_BATCH during processing appends without clearing files", () => {
+    const prev: AppState = {
+      ...initialState(),
+      status: "processing",
+      activeBatches: 1,
+      files: [
+        { id: "1", filename: "a.png", path: "/a.png", status: "done" },
+      ],
+    };
+    const state = appReducer(prev, { type: "START_BATCH" });
+    expect(state.activeBatches).toBe(2);
+    expect(state.files).toHaveLength(1);
+    expect(state.status).toBe("processing");
+  });
+
+  it("START_BATCH when idle/done clears files", () => {
+    const prev: AppState = {
+      ...initialState(),
+      status: "done",
+      activeBatches: 0,
+      files: [
+        { id: "1", filename: "a.png", path: "/a.png", status: "done" },
+      ],
+    };
+    const state = appReducer(prev, { type: "START_BATCH" });
+    expect(state.files).toHaveLength(0);
+    expect(state.activeBatches).toBe(1);
+  });
+
+  it("BATCH_COMPLETE decrements activeBatches", () => {
+    const prev: AppState = {
+      ...initialState(),
+      status: "processing",
+      activeBatches: 2,
+    };
+    const state = appReducer(prev, { type: "BATCH_COMPLETE" });
+    expect(state.activeBatches).toBe(1);
+    expect(state.status).toBe("processing");
+  });
+
+  it("BATCH_COMPLETE transitions to done when activeBatches reaches 0", () => {
+    const prev: AppState = {
+      ...initialState(),
+      status: "processing",
+      activeBatches: 1,
+    };
+    const state = appReducer(prev, { type: "BATCH_COMPLETE" });
+    expect(state.activeBatches).toBe(0);
+    expect(state.status).toBe("done");
+  });
+
   it("UPDATE_SETTINGS merges partial settings", () => {
     const state = appReducer(initialState(), {
       type: "UPDATE_SETTINGS",
