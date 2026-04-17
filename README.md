@@ -1,6 +1,6 @@
 # squish desktop
 
-Super fast local image & media compression on your machine. Drag and drop files or folders, get `*_squished.*` siblings alongside the originals. Non-destructive — originals are never touched.
+Super fast local image & media compression on your machine. Drag and drop files or folders, get `*_squished.*` siblings alongside the originals. Non-destructive - originals are never touched.
 
 Built with [Tauri 2](https://tauri.app) + React, powered by the same [`squish-core`](https://github.com/MikeDre/squish) compression library as the CLI.
 
