@@ -48,13 +48,8 @@ export function DropZone({ status, onDrop }: DropZoneProps) {
   const handleBrowse = async () => {
     try {
       const result = await open({ multiple: true, directory: false });
-      if (result && Array.isArray(result)) {
-        const paths = result.map((f) =>
-          typeof f === "string" ? f : f.path
-        );
-        if (paths.length > 0) {
-          onDrop(paths);
-        }
+      if (result && result.length > 0) {
+        onDrop(result);
       }
     } catch {
       // User cancelled or dialog error — no-op.
