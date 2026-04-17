@@ -101,5 +101,18 @@ describe("loadSettings", () => {
     expect(s.quality).toBeNull();
     expect(s.lossless).toBe(false);
     expect(s.format).toBeNull();
+    expect(s.recursive).toBe(false);
+  });
+
+  it("merges saved settings with defaults for missing keys", () => {
+    localStorage.setItem(
+      "squish-settings",
+      JSON.stringify({ quality: 80, lossless: true })
+    );
+    const s = loadSettings();
+    expect(s.quality).toBe(80);
+    expect(s.lossless).toBe(true);
+    expect(s.format).toBeNull();
+    expect(s.recursive).toBe(false);
   });
 });

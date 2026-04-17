@@ -51,6 +51,7 @@ export interface Settings {
   quality: number | null;  // null = format default
   lossless: boolean;
   format: string | null;   // null = preserve input format
+  recursive: boolean;
 }
 
 export type AppStatus = 'idle' | 'processing' | 'done';
@@ -59,6 +60,7 @@ export interface AppState {
   status: AppStatus;
   files: FileEntry[];
   settings: Settings;
+  activeBatches: number;
 }
 
 // --- Reducer actions ---
@@ -77,6 +79,7 @@ export const DEFAULT_SETTINGS: Settings = {
   quality: null,
   lossless: false,
   format: null,
+  recursive: false,
 };
 
 export const FORMAT_OPTIONS = [
@@ -89,3 +92,7 @@ export const FORMAT_OPTIONS = [
   { value: 'gif', label: 'GIF' },
   { value: 'heic', label: 'HEIC' },
 ] as const;
+
+// --- Theme types ---
+export type ThemePreference = 'system' | 'light' | 'dark';
+export type EffectiveTheme = 'light' | 'dark';

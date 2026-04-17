@@ -22,12 +22,13 @@ export function loadSettings(): Settings {
         quality: parsed.quality ?? null,
         lossless: parsed.lossless ?? false,
         format: parsed.format ?? null,
+        recursive: parsed.recursive ?? false,
       };
     }
   } catch {
     // Corrupted localStorage — use defaults.
   }
-  return { quality: null, lossless: false, format: null };
+  return { quality: null, lossless: false, format: null, recursive: false };
 }
 
 function saveSettings(settings: Settings) {
@@ -43,6 +44,7 @@ export function initialState(): AppState {
     status: "idle",
     files: [],
     settings: loadSettings(),
+    activeBatches: 0,
   };
 }
 
