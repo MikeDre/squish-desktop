@@ -7,6 +7,7 @@ pub struct SquishOptionsPayload {
     pub quality: Option<u8>,
     pub lossless: bool,
     pub format: Option<String>,
+    pub recursive: bool,
 }
 
 #[derive(Serialize, Clone)]
@@ -48,17 +49,19 @@ pub fn get_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
 
-/// Expand paths: files pass through, directories are walked (top-level only).
-pub fn expand_paths(paths: &[String]) -> Vec<PathBuf> {
+/// Expand paths: files pass through, directories are walked.
+/// When `recursive` is false, only the top level of each directory is visited.
+pub fn expand_paths(paths: &[String], recursive: bool) -> Vec<PathBuf> {
     let mut files = Vec::new();
     for p in paths {
         let path = PathBuf::from(p);
         if path.is_file() {
             files.push(path);
         } else if path.is_dir() {
-            let walker = WalkDir::new(&path)
-                .follow_links(false)
-                .max_depth(1);
+            let mut walker = WalkDir::new(&path).follow_links(false);
+            if !recursive {
+                walker = walker.max_depth(1);
+            }
             for entry in walker.into_iter().filter_map(|e| e.ok()) {
                 if entry.file_type().is_file() {
                     files.push(entry.into_path());
@@ -100,7 +103,7 @@ pub async fn squish_files(
     options: SquishOptionsPayload,
 ) -> Result<BatchResult, String> {
     let opts = to_squish_options(&options);
-    let all_files = expand_paths(&paths);
+    let all_files = expand_paths(&paths, options.recursive);
 
     // Partition into known-format and skipped.
     let mut known: Vec<PathBuf> = Vec::new();
@@ -202,7 +205,7 @@ mod tests {
 
     #[test]
     fn expand_paths_with_nonexistent_path_returns_empty() {
-        let result = expand_paths(&["/nonexistent/path/xyz".into()]);
+        let result = expand_paths(&["/nonexistent/path/xyz".into()], false);
         assert!(result.is_empty());
     }
 }
