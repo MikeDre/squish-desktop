@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { open } from "@tauri-apps/plugin-dialog";
 import type { AppStatus } from "../types";
 import "./DropZone.css";
 
@@ -25,9 +26,7 @@ export function DropZone({ status, onDrop }: DropZoneProps) {
             setIsDragOver(true);
           } else if (event.payload.type === "drop") {
             setIsDragOver(false);
-            if (status !== "processing") {
-              onDrop(event.payload.paths);
-            }
+            onDrop(event.payload.paths);
           } else if (event.payload.type === "leave") {
             setIsDragOver(false);
           }
@@ -44,17 +43,27 @@ export function DropZone({ status, onDrop }: DropZoneProps) {
       cancelled = true;
       unlistenRef.current?.();
     };
-  }, [status, onDrop]);
+  }, [onDrop]);
+
+  const handleBrowse = async () => {
+    try {
+      const result = await open({ multiple: true, directory: false });
+      if (result && Array.isArray(result)) {
+        const paths = result.map((f) =>
+          typeof f === "string" ? f : f.path
+        );
+        if (paths.length > 0) {
+          onDrop(paths);
+        }
+      }
+    } catch {
+      // User cancelled or dialog error — no-op.
+    }
+  };
 
   const statusText = () => {
-    switch (status) {
-      case "idle":
-        return "Drop images here to compress";
-      case "processing":
-        return "Compressing...";
-      case "done":
-        return "Drop more images to compress";
-    }
+    if (status === "processing") return "Drop more files to add to queue";
+    return "Drop files here to compress";
   };
 
   const className = [
@@ -68,7 +77,15 @@ export function DropZone({ status, onDrop }: DropZoneProps) {
   return (
     <div className={className}>
       <div className="dropzone__content">
+        <div className="dropzone__icon">📁</div>
         <p className="dropzone__text">{statusText()}</p>
+        <button
+          className="dropzone__browse-btn"
+          onClick={handleBrowse}
+          aria-label="Browse files"
+        >
+          Browse files
+        </button>
       </div>
     </div>
   );
