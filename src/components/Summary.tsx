@@ -1,4 +1,5 @@
 import type { BatchResult } from "../types";
+import "./Summary.css";
 
 interface SummaryProps {
   result: BatchResult;

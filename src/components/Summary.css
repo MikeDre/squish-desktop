@@ -1,0 +1,23 @@
+.summary {
+  padding: 12px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-glass-strong);
+  backdrop-filter: blur(var(--blur-strong));
+  -webkit-backdrop-filter: blur(var(--blur-strong));
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.summary__stat {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.summary__errors {
+  color: var(--error);
+  font-weight: 600;
+}
