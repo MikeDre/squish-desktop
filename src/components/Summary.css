@@ -1,11 +1,9 @@
 .summary {
-  padding: 12px 14px;
-  font-size: 12px;
+  padding: 14px 16px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
-  background: var(--bg-glass-strong);
-  backdrop-filter: blur(var(--blur-strong));
-  -webkit-backdrop-filter: blur(var(--blur-strong));
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
@@ -14,10 +12,10 @@
 
 .summary__stat {
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .summary__errors {
   color: var(--error);
-  font-weight: 600;
+  font-weight: 700;
 }

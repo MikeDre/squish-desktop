@@ -1,7 +1,5 @@
 .settings-panel {
-  background: var(--bg-glass);
-  backdrop-filter: blur(var(--blur));
-  -webkit-backdrop-filter: blur(var(--blur));
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
@@ -11,10 +9,12 @@
 .settings-panel__toggle {
   background: none;
   border: none;
+  font-family: inherit;
   font-size: 13px;
+  font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 10px 14px;
+  padding: 12px 16px;
   width: 100%;
   text-align: left;
   transition: color var(--transition);
@@ -38,10 +38,10 @@
 }
 
 .settings-panel__body {
-  padding: 0 14px 14px;
+  padding: 0 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   animation: settings-slide-in 0.2s ease;
 }
 
@@ -64,22 +64,23 @@
 
 .settings-panel__field label {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .settings-panel__field select {
-  padding: 7px 10px;
-  background: var(--bg-surface);
+  padding: 8px 12px;
+  background: var(--bg-input);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
+  font-family: inherit;
   font-size: 13px;
   color: var(--text-primary);
   transition: border-color var(--transition);
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239CA3AF' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   padding-right: 28px;
@@ -88,7 +89,7 @@
 .settings-panel__field select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-glow);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .settings-panel__quality-row {
@@ -102,18 +103,18 @@
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
-  background: var(--border);
+  background: var(--bg-input);
   border-radius: 2px;
   outline: none;
 }
 
 .settings-panel__quality-row input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: transform var(--transition);
 }
@@ -132,7 +133,7 @@
 
 .settings-panel__quality-value {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   min-width: 28px;
   text-align: right;
   color: var(--accent);
@@ -142,7 +143,7 @@
   font-size: 13px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   color: var(--text-primary);
   cursor: pointer;
 }

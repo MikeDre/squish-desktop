@@ -2,9 +2,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
-  background: var(--bg-glass);
-  border: 1px solid var(--border-light);
+  padding: 12px 14px;
+  background: transparent;
   border-radius: var(--radius-sm);
   gap: 12px;
   transition: all var(--transition);
@@ -23,7 +22,7 @@
 }
 
 .file-row:hover {
-  background: var(--bg-surface);
+  background: var(--bg-card-hover);
 }
 
 .file-row__status-dot {
@@ -57,7 +56,7 @@
 }
 
 .file-row__name {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   min-width: 0;
   overflow: hidden;
@@ -73,7 +72,7 @@
 
 .file-row__progress-bar {
   height: 4px;
-  background: var(--border);
+  background: var(--bg-input);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -95,13 +94,13 @@
   display: flex;
   gap: 10px;
   align-items: center;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
   flex-shrink: 0;
 }
 
 .file-row__savings {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--success);
 }
 
@@ -111,24 +110,24 @@
   color: var(--text-tertiary);
   cursor: pointer;
   font-size: 14px;
-  padding: 2px 4px;
-  border-radius: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
   opacity: 0;
   transition: all var(--transition);
 }
 
 .file-row:hover .file-row__reveal-btn {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .file-row__reveal-btn:hover {
   opacity: 1 !important;
   color: var(--accent);
-  background: var(--bg-glass);
+  background: var(--accent-light);
 }
 
 .file-row__error {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--error);
   flex: 1;
   text-align: right;
