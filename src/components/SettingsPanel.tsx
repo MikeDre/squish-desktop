@@ -133,6 +133,23 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
               />
             </div>
           </div>
+
+          <details className="settings-panel__advanced">
+            <summary>Advanced</summary>
+            <div className="settings-panel__field">
+              <label htmlFor="suffix">Output suffix</label>
+              <input
+                id="suffix"
+                type="text"
+                placeholder="squished"
+                value={settings.suffix ?? ""}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  onChange({ suffix: v === "" ? null : v });
+                }}
+              />
+            </div>
+          </details>
         </div>
       )}
     </div>

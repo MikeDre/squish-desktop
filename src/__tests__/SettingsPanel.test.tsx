@@ -93,4 +93,46 @@ describe("SettingsPanel", () => {
     await user.clear(screen.getByLabelText(/max width/i));
     expect(onChange).toHaveBeenLastCalledWith({ maxWidth: null });
   });
+
+  it("hides the suffix input until the Advanced disclosure is opened", async () => {
+    const user = userEvent.setup();
+    render(
+      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />
+    );
+    await user.click(screen.getByRole("button", { name: /settings/i }));
+    // The disclosure content is in the DOM but hidden; the trigger is visible.
+    const advanced = screen.getByText(/advanced/i);
+    expect(advanced).toBeInTheDocument();
+
+    // Native <details> reflects open state on the parent element.
+    const details = advanced.closest("details");
+    expect(details?.hasAttribute("open")).toBe(false);
+
+    await user.click(advanced);
+    expect(details?.hasAttribute("open")).toBe(true);
+    expect(screen.getByLabelText(/output suffix/i)).toBeInTheDocument();
+  });
+
+  it("calls onChange with suffix when typed", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(<SettingsPanel settings={DEFAULT_SETTINGS} onChange={onChange} />);
+    await user.click(screen.getByRole("button", { name: /settings/i }));
+    await user.click(screen.getByText(/advanced/i));
+    fireEvent.change(screen.getByLabelText(/output suffix/i), {
+      target: { value: "min" },
+    });
+    expect(onChange).toHaveBeenLastCalledWith({ suffix: "min" });
+  });
+
+  it("calls onChange with suffix null when cleared", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const populated = { ...DEFAULT_SETTINGS, suffix: "min" };
+    render(<SettingsPanel settings={populated} onChange={onChange} />);
+    await user.click(screen.getByRole("button", { name: /settings/i }));
+    await user.click(screen.getByText(/advanced/i));
+    await user.clear(screen.getByLabelText(/output suffix/i));
+    expect(onChange).toHaveBeenLastCalledWith({ suffix: null });
+  });
 });
