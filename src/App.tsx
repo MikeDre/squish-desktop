@@ -24,12 +24,18 @@ export function loadSettings(): Settings {
         lossless: parsed.lossless ?? false,
         format: parsed.format ?? null,
         recursive: parsed.recursive ?? false,
+        maxWidth: parsed.maxWidth ?? null,
+        maxHeight: parsed.maxHeight ?? null,
+        suffix: parsed.suffix ?? null,
       };
     }
   } catch {
     // Corrupted localStorage — use defaults.
   }
-  return { quality: null, lossless: false, format: null, recursive: false };
+  return {
+    quality: null, lossless: false, format: null, recursive: false,
+    maxWidth: null, maxHeight: null, suffix: null,
+  };
 }
 
 function saveSettings(settings: Settings) {

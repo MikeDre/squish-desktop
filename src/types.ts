@@ -52,6 +52,9 @@ export interface Settings {
   lossless: boolean;
   format: string | null;   // null = preserve input format
   recursive: boolean;
+  maxWidth: number | null;
+  maxHeight: number | null;
+  suffix: string | null;   // null = backend default ("squished")
 }
 
 export type AppStatus = 'idle' | 'processing' | 'done';
@@ -80,6 +83,9 @@ export const DEFAULT_SETTINGS: Settings = {
   lossless: false,
   format: null,
   recursive: false,
+  maxWidth: null,
+  maxHeight: null,
+  suffix: null,
 };
 
 export const FORMAT_OPTIONS = [

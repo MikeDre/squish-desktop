@@ -15,7 +15,7 @@ describe("useSquish", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     dispatch = vi.fn() as unknown as React.Dispatch<AppAction>;
-    settings = { quality: null, lossless: false, format: null, recursive: false };
+    settings = { quality: null, lossless: false, format: null, recursive: false, maxWidth: null, maxHeight: null, suffix: null };
 
     // Default: listen returns an unlisten function.
     mockListen.mockResolvedValue(() => {});

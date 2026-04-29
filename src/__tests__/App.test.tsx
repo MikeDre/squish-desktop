@@ -148,6 +148,17 @@ describe("appReducer", () => {
     expect(state.settings.lossless).toBe(true);
     expect(state.settings.quality).toBeNull(); // unchanged
   });
+
+  it("UPDATE_SETTINGS merges maxWidth, maxHeight, and suffix", () => {
+    const state = appReducer(initialState(), {
+      type: "UPDATE_SETTINGS",
+      settings: { maxWidth: 1920, maxHeight: 1080, suffix: "min" },
+    });
+    expect(state.settings.maxWidth).toBe(1920);
+    expect(state.settings.maxHeight).toBe(1080);
+    expect(state.settings.suffix).toBe("min");
+    expect(state.settings.quality).toBeNull(); // unchanged
+  });
 });
 
 describe("loadSettings", () => {
@@ -170,5 +181,24 @@ describe("loadSettings", () => {
     expect(s.lossless).toBe(true);
     expect(s.format).toBeNull();
     expect(s.recursive).toBe(false);
+  });
+
+  it("returns null defaults for maxWidth, maxHeight, and suffix when localStorage is empty", () => {
+    localStorage.clear();
+    const s = loadSettings();
+    expect(s.maxWidth).toBeNull();
+    expect(s.maxHeight).toBeNull();
+    expect(s.suffix).toBeNull();
+  });
+
+  it("preserves saved maxWidth, maxHeight, and suffix from localStorage", () => {
+    localStorage.setItem(
+      "squish-settings",
+      JSON.stringify({ maxWidth: 2560, maxHeight: 1440, suffix: "compressed" })
+    );
+    const s = loadSettings();
+    expect(s.maxWidth).toBe(2560);
+    expect(s.maxHeight).toBe(1440);
+    expect(s.suffix).toBe("compressed");
   });
 });
