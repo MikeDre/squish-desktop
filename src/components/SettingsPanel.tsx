@@ -101,6 +101,38 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
               Include subfolders
             </label>
           </div>
+
+          <div className="settings-panel__field">
+            <label>Resize</label>
+            <div className="settings-panel__resize-row">
+              <input
+                type="number"
+                min="1"
+                placeholder="Max width (px)"
+                aria-label="Max width"
+                value={settings.maxWidth ?? ""}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  if (raw === "") return onChange({ maxWidth: null });
+                  const n = parseInt(raw, 10);
+                  onChange({ maxWidth: Number.isNaN(n) ? null : n });
+                }}
+              />
+              <input
+                type="number"
+                min="1"
+                placeholder="Max height (px)"
+                aria-label="Max height"
+                value={settings.maxHeight ?? ""}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  if (raw === "") return onChange({ maxHeight: null });
+                  const n = parseInt(raw, 10);
+                  onChange({ maxHeight: Number.isNaN(n) ? null : n });
+                }}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>
