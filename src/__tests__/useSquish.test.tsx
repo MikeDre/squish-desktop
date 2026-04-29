@@ -32,19 +32,19 @@ describe("useSquish", () => {
     expect(mockListen).toHaveBeenCalledWith("squish://file-error", expect.any(Function));
   });
 
-  it("squishFiles invokes Tauri command with correct args", async () => {
+  it("squishFiles invokes Tauri command with correct args including new fields", async () => {
     const batchResult: BatchResult = {
-      total_files: 1,
-      success_count: 1,
-      error_count: 0,
-      skipped_count: 0,
-      total_input_bytes: 100,
-      total_output_bytes: 50,
-      total_duration_ms: 200,
+      total_files: 1, success_count: 1, error_count: 0, skipped_count: 0,
+      total_input_bytes: 100, total_output_bytes: 50, total_duration_ms: 200,
     };
     mockInvoke.mockResolvedValue(batchResult);
 
-    const { result } = renderHook(() => useSquish(dispatch, settings));
+    const filledSettings: Settings = {
+      quality: 80, lossless: false, format: "webp", recursive: true,
+      maxWidth: 1920, maxHeight: 1080, suffix: "min",
+    };
+
+    const { result } = renderHook(() => useSquish(dispatch, filledSettings));
 
     await act(async () => {
       await result.current.squishFiles(["/tmp/a.png"]);
@@ -52,7 +52,10 @@ describe("useSquish", () => {
 
     expect(mockInvoke).toHaveBeenCalledWith("squish_files", {
       paths: ["/tmp/a.png"],
-      options: { quality: null, lossless: false, format: null, recursive: false },
+      options: {
+        quality: 80, lossless: false, format: "webp", recursive: true,
+        max_width: 1920, max_height: 1080, suffix: "min",
+      },
     });
   });
 });
