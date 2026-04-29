@@ -51,6 +51,8 @@ Click the gear icon to adjust:
 - **Quality** — 0-100 slider, or Auto for format-specific defaults
 - **Format** — convert output to PNG, JPEG, WebP, AVIF, SVG, GIF, or HEIC
 - **Lossless** — preserve every bit (overrides quality)
+- **Resize** — constrain output by max width and/or max height in pixels. Proportional, never upscales.
+- **Output suffix** *(advanced)* — customize the filename suffix on compressed outputs (default `squished` produces `dog_squished.png`)
 
 Settings persist across sessions.
 
