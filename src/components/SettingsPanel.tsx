@@ -132,6 +132,9 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
                 }}
               />
             </div>
+            <p className="settings-panel__hint">
+              Images larger than these dimensions are scaled down proportionally. Never upscales.
+            </p>
           </div>
 
           <details className="settings-panel__advanced">
@@ -148,6 +151,9 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
                   onChange({ suffix: v === "" ? null : v });
                 }}
               />
+              <p className="settings-panel__hint">
+                Filename suffix for compressed outputs. Default produces e.g. <code>dog_squished.png</code>.
+              </p>
             </div>
           </details>
         </div>
