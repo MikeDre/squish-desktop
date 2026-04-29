@@ -201,4 +201,14 @@ describe("loadSettings", () => {
     expect(s.maxHeight).toBe(1440);
     expect(s.suffix).toBe("compressed");
   });
+
+  it("preserves maxWidth and maxHeight of 0 (does not coerce to null via || )", () => {
+    localStorage.setItem(
+      "squish-settings",
+      JSON.stringify({ maxWidth: 0, maxHeight: 0 })
+    );
+    const s = loadSettings();
+    expect(s.maxWidth).toBe(0);
+    expect(s.maxHeight).toBe(0);
+  });
 });
