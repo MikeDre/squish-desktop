@@ -8,6 +8,9 @@ pub struct SquishOptionsPayload {
     pub lossless: bool,
     pub format: Option<String>,
     pub recursive: bool,
+    pub max_width: Option<u32>,
+    pub max_height: Option<u32>,
+    pub suffix: Option<String>,
 }
 
 #[derive(Serialize, Clone)]
@@ -84,6 +87,14 @@ fn to_squish_options(payload: &SquishOptionsPayload) -> SquishOptions {
         lossless: payload.lossless,
         output_format: payload.format.as_deref().and_then(Format::parse),
         force_overwrite: false,
+        max_width: payload.max_width.filter(|&w| w > 0),
+        max_height: payload.max_height.filter(|&h| h > 0),
+        suffix: payload
+            .suffix
+            .as_deref()
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .map(str::to_owned),
     }
 }
 
@@ -207,5 +218,51 @@ mod tests {
     fn expand_paths_with_nonexistent_path_returns_empty() {
         let result = expand_paths(&["/nonexistent/path/xyz".into()], false);
         assert!(result.is_empty());
+    }
+
+    fn payload_full() -> SquishOptionsPayload {
+        SquishOptionsPayload {
+            quality: None,
+            lossless: false,
+            format: None,
+            recursive: false,
+            max_width: Some(1920),
+            max_height: Some(1080),
+            suffix: Some("min".to_string()),
+        }
+    }
+
+    #[test]
+    fn to_squish_options_maps_resize_and_suffix() {
+        let opts = to_squish_options(&payload_full());
+        assert_eq!(opts.max_width, Some(1920));
+        assert_eq!(opts.max_height, Some(1080));
+        assert_eq!(opts.suffix.as_deref(), Some("min"));
+    }
+
+    #[test]
+    fn to_squish_options_normalizes_zero_dims_to_none() {
+        let p = SquishOptionsPayload {
+            quality: None, lossless: false, format: None, recursive: false,
+            max_width: Some(0), max_height: Some(0), suffix: None,
+        };
+        let opts = to_squish_options(&p);
+        assert!(opts.max_width.is_none());
+        assert!(opts.max_height.is_none());
+    }
+
+    #[test]
+    fn to_squish_options_normalizes_empty_or_whitespace_suffix_to_none() {
+        let empty = SquishOptionsPayload {
+            quality: None, lossless: false, format: None, recursive: false,
+            max_width: None, max_height: None, suffix: Some("".to_string()),
+        };
+        assert!(to_squish_options(&empty).suffix.is_none());
+
+        let ws = SquishOptionsPayload {
+            quality: None, lossless: false, format: None, recursive: false,
+            max_width: None, max_height: None, suffix: Some("   ".to_string()),
+        };
+        assert!(to_squish_options(&ws).suffix.is_none());
     }
 }
