@@ -1,4 +1,5 @@
 mod commands;
+mod dispatch;
 
 use tauri::{
     menu::{Menu, MenuItem},
