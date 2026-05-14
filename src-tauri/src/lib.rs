@@ -1,6 +1,7 @@
 mod commands;
 mod dispatch;
 mod ffmpeg;
+mod options;
 
 use tauri::{
     menu::{Menu, MenuItem},
