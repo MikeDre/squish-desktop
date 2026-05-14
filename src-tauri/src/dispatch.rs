@@ -1,10 +1,10 @@
 //! File-kind detection and crate dispatch.
 
 use serde::Serialize;
+use std::path::Path;
 use std::time::Duration;
 
 // Consumed by detect_kind in Task 3 and the dispatcher in Task 6+.
-#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum FileKind {
@@ -60,6 +60,40 @@ impl UnifiedResult {
         }
         (1.0 - (self.output_bytes as f64 / self.input_bytes as f64)) * 100.0
     }
+}
+
+// --- File kind detection ---
+
+/// Classify a file into one of the four families, or Unknown.
+///
+/// Extension-based for non-ambiguous formats. Ambiguous audio extensions
+/// (e.g., `.ogg`, `.mka`) that may actually contain video are resolved
+/// at the dispatch boundary via `ffprobe` — `detect_kind` itself does no
+/// process work, keeping it cheap to call per file.
+pub fn detect_kind(path: &Path) -> FileKind {
+    if let Ok(bytes) = peek_head(path) {
+        if squish_core::detect_format(path, &bytes).is_some() {
+            return FileKind::Image;
+        }
+    }
+    if squish_video::detect_video_format(path).is_some() {
+        return FileKind::Video;
+    }
+    if squish_audio::detect_audio_format(path).is_some() {
+        return FileKind::Audio;
+    }
+    if squish_code::detect_code_format(path).is_some() {
+        return FileKind::Code;
+    }
+    FileKind::Unknown
+}
+
+fn peek_head(path: &Path) -> std::io::Result<Vec<u8>> {
+    use std::io::Read;
+    let mut f = std::fs::File::open(path)?;
+    let mut head = [0u8; 32];
+    let n = f.read(&mut head)?;
+    Ok(head[..n].to_vec())
 }
 
 // --- Native error → UnifiedError mappers ---
@@ -136,6 +170,15 @@ impl From<squish_code::CodeError> for UnifiedError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
+    use std::path::PathBuf;
+    use tempfile::TempDir;
+
+    fn touch(dir: &TempDir, name: &str) -> PathBuf {
+        let p = dir.path().join(name);
+        fs::write(&p, b"\0\0\0\0").unwrap();
+        p
+    }
 
     #[test]
     fn audio_missing_dep_maps_to_missing_dependency() {
@@ -175,5 +218,51 @@ mod tests {
             warnings: vec![],
         };
         assert_eq!(r.reduction_percent(), 0.0);
+    }
+
+    #[test]
+    fn detect_kind_image_from_extension() {
+        let tmp = TempDir::new().unwrap();
+        for name in ["a.jpg", "a.jpeg", "a.png", "a.webp", "a.gif"] {
+            let p = touch(&tmp, name);
+            assert_eq!(detect_kind(&p), FileKind::Image, "expected Image for {name}");
+        }
+    }
+
+    #[test]
+    fn detect_kind_video_from_extension() {
+        let tmp = TempDir::new().unwrap();
+        for name in ["a.mp4", "a.mkv", "a.webm"] {
+            let p = touch(&tmp, name);
+            assert_eq!(detect_kind(&p), FileKind::Video, "expected Video for {name}");
+        }
+    }
+
+    #[test]
+    fn detect_kind_code_from_extension() {
+        let tmp = TempDir::new().unwrap();
+        for name in ["a.js", "a.ts", "a.css", "a.html", "a.json"] {
+            let p = touch(&tmp, name);
+            assert_eq!(detect_kind(&p), FileKind::Code, "expected Code for {name}");
+        }
+    }
+
+    #[test]
+    fn detect_kind_unknown_extension() {
+        let tmp = TempDir::new().unwrap();
+        let p = touch(&tmp, "mystery.xyz");
+        assert_eq!(detect_kind(&p), FileKind::Unknown);
+    }
+
+    #[test]
+    fn detect_kind_image_via_magic_bytes_when_extension_lies() {
+        // Real PNG magic bytes (8-byte signature) in a file with no .png extension.
+        // This verifies peek_head + squish_core::detect_format's magic-byte fallback
+        // is actually exercised, not just the extension-matching shortcut.
+        let tmp = TempDir::new().unwrap();
+        let p = tmp.path().join("mystery_image.bin");
+        let png_magic: [u8; 8] = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+        fs::write(&p, png_magic).unwrap();
+        assert_eq!(detect_kind(&p), FileKind::Image);
     }
 }
