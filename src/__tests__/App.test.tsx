@@ -156,7 +156,7 @@ describe("appReducer", () => {
   it("UPDATE_SETTINGS merges partial image settings", () => {
     const state = appReducer(initialState(), {
       type: "UPDATE_SETTINGS",
-      settings: { image: { lossless: true } },
+      settings: { image: { ...DEFAULT_SETTINGS.image, lossless: true } },
     });
     expect(state.settings.image.lossless).toBe(true);
     expect(state.settings.image.quality).toBeNull(); // unchanged
@@ -165,7 +165,7 @@ describe("appReducer", () => {
   it("UPDATE_SETTINGS merges image maxWidth, maxHeight, and suffix", () => {
     const state = appReducer(initialState(), {
       type: "UPDATE_SETTINGS",
-      settings: { image: { maxWidth: 1920, maxHeight: 1080, suffix: "min" } },
+      settings: { image: { ...DEFAULT_SETTINGS.image, maxWidth: 1920, maxHeight: 1080, suffix: "min" } },
     });
     expect(state.settings.image.maxWidth).toBe(1920);
     expect(state.settings.image.maxHeight).toBe(1080);
@@ -186,7 +186,7 @@ describe("appReducer", () => {
   it("UPDATE_SETTINGS deep-merges audio settings", () => {
     const state = appReducer(initialState(), {
       type: "UPDATE_SETTINGS",
-      settings: { audio: { codec: "mp3", bitrateKbps: 192 } },
+      settings: { audio: { ...DEFAULT_SETTINGS.audio, codec: "mp3", bitrateKbps: 192 } },
     });
     expect(state.settings.audio.codec).toBe("mp3");
     expect(state.settings.audio.bitrateKbps).toBe(192);
