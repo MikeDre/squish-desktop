@@ -19,3 +19,21 @@
   color: var(--error);
   font-weight: 700;
 }
+
+.summary__families {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.summary__family-pill {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-elev);
+  color: var(--text-secondary);
+}
+
+.summary__skipped {
+  color: var(--text-secondary);
+}
