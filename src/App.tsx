@@ -2,6 +2,7 @@ import { useReducer, useCallback, useState } from "react";
 import { DropZone } from "./components/DropZone";
 import { FileList } from "./components/FileList";
 import { SettingsPanel } from "./components/SettingsPanel";
+import { FfmpegOnboarding } from "./components/FfmpegOnboarding";
 import { useSquish } from "./hooks/useSquish";
 import { useTheme } from "./hooks/useTheme";
 import { useFfmpegStatus } from "./hooks/useFfmpegStatus";
@@ -159,6 +160,11 @@ function App() {
           {effectiveTheme === "dark" ? "☀" : "☾"}
         </button>
       </div>
+      <FfmpegOnboarding
+        visible={ffmpeg.loaded && (!ffmpeg.ffmpeg || !ffmpeg.ffprobe) &&
+          (queueFamilies.has('audio') || queueFamilies.has('video'))}
+        onRecheck={ffmpeg.recheck}
+      />
       <DropZone status={state.status} onDrop={handleDrop} />
       <SettingsPanel
         settings={state.settings}
