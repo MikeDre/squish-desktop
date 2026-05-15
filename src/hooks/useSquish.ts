@@ -10,9 +10,39 @@ import type {
   BatchResult,
 } from "../types";
 
+function buildPayload(settings: Settings) {
+  return {
+    recursive: settings.recursive,
+    force_overwrite: false,
+    image: {
+      quality: settings.image.quality,
+      lossless: settings.image.lossless,
+      format: settings.image.format,
+      max_width: settings.image.maxWidth,
+      max_height: settings.image.maxHeight,
+      suffix: settings.image.suffix,
+    },
+    audio: {
+      codec: settings.audio.codec,
+      bitrate_kbps: settings.audio.bitrateKbps,
+      suffix: settings.audio.suffix,
+    },
+    video: {
+      codec: settings.video.codec,
+      crf: settings.video.crf,
+      preset: settings.video.preset,
+      suffix: settings.video.suffix,
+    },
+    code: {
+      source_map: settings.code.sourceMap,
+      suffix: settings.code.suffix,
+    },
+  };
+}
+
 export function useSquish(
   dispatch: React.Dispatch<AppAction>,
-  settings: Settings
+  settings: Settings,
 ) {
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
@@ -35,20 +65,13 @@ export function useSquish(
       unlisteners.push(u2);
 
       const u3 = await listen<FileErrorPayload>("squish://file-error", (event) => {
-        if (!cancelled) {
-          dispatch({
-            type: "FILE_ERROR",
-            id: event.payload.id,
-            error: event.payload.error,
-          });
-        }
+        if (!cancelled) dispatch({ type: "FILE_ERROR", payload: event.payload });
       });
       if (cancelled) { u3(); return; }
       unlisteners.push(u3);
     }
 
     setup();
-
     return () => {
       cancelled = true;
       unlisteners.forEach((fn) => fn());
@@ -60,15 +83,7 @@ export function useSquish(
       try {
         const result = await invoke<BatchResult>("squish_files", {
           paths,
-          options: {
-            quality: settingsRef.current.quality,
-            lossless: settingsRef.current.lossless,
-            format: settingsRef.current.format,
-            recursive: settingsRef.current.recursive,
-            max_width: settingsRef.current.maxWidth,
-            max_height: settingsRef.current.maxHeight,
-            suffix: settingsRef.current.suffix,
-          },
+          options: buildPayload(settingsRef.current),
         });
         dispatch({ type: "BATCH_COMPLETE" });
         return result;
@@ -78,8 +93,11 @@ export function useSquish(
         return null;
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
   return { squishFiles };
 }
+
+// Exported for testing.
+export { buildPayload };
