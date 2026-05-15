@@ -1,0 +1,11 @@
+.code-settings { display: flex; flex-direction: column; gap: 12px; }
+.code-settings__field { display: flex; flex-direction: column; gap: 4px; }
+.code-settings input[type="text"] {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-primary);
+}
