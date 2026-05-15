@@ -4,53 +4,21 @@ import { FileList } from "./components/FileList";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { useSquish } from "./hooks/useSquish";
 import { useTheme } from "./hooks/useTheme";
+import { migrateSettings, saveSettings } from "./lib/settings/migrate";
 import type {
   AppState,
   AppAction,
   Settings,
   BatchResult,
+  FileEntry,
 } from "./types";
 import "./App.css";
-
-const SETTINGS_KEY = "squish-settings";
-
-export function loadSettings(): Settings {
-  try {
-    const stored = localStorage.getItem(SETTINGS_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return {
-        quality: parsed.quality ?? null,
-        lossless: parsed.lossless ?? false,
-        format: parsed.format ?? null,
-        recursive: parsed.recursive ?? false,
-        maxWidth: parsed.maxWidth ?? null,
-        maxHeight: parsed.maxHeight ?? null,
-        suffix: parsed.suffix ?? null,
-      };
-    }
-  } catch {
-    // Corrupted localStorage — use defaults.
-  }
-  return {
-    quality: null, lossless: false, format: null, recursive: false,
-    maxWidth: null, maxHeight: null, suffix: null,
-  };
-}
-
-function saveSettings(settings: Settings) {
-  try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-  } catch {
-    // localStorage full or unavailable — silently ignore.
-  }
-}
 
 export function initialState(): AppState {
   return {
     status: "idle",
     files: [],
-    settings: loadSettings(),
+    settings: migrateSettings(),
     activeBatches: 0,
   };
 }
@@ -67,19 +35,16 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       };
     }
 
-    case "FILE_START":
-      return {
-        ...state,
-        files: [
-          ...state.files,
-          {
-            id: action.payload.id,
-            filename: action.payload.filename,
-            path: action.payload.path,
-            status: "compressing",
-          },
-        ],
+    case "FILE_START": {
+      const entry: FileEntry = {
+        id: action.payload.id,
+        filename: action.payload.filename,
+        path: action.payload.path,
+        family: action.payload.family,
+        status: "compressing",
       };
+      return { ...state, files: [...state.files, entry] };
+    }
 
     case "FILE_DONE":
       return {
@@ -89,13 +54,15 @@ export function appReducer(state: AppState, action: AppAction): AppState {
             ? {
                 ...f,
                 status: "done",
+                family: action.payload.family,
                 inputBytes: action.payload.input_bytes,
                 outputBytes: action.payload.output_bytes,
                 outputPath: action.payload.output_path,
                 reductionPercent: action.payload.reduction_percent,
                 durationMs: action.payload.duration_ms,
+                warnings: action.payload.warnings,
               }
-            : f
+            : f,
         ),
       };
 
@@ -103,7 +70,15 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         files: state.files.map((f) =>
-          f.id === action.id ? { ...f, status: "error", error: action.error } : f
+          f.id === action.payload.id
+            ? {
+                ...f,
+                status: "error",
+                family: action.payload.family,
+                error: action.payload.error,
+                errorKind: action.payload.kind,
+              }
+            : f,
         ),
       };
 
@@ -117,9 +92,16 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case "UPDATE_SETTINGS": {
-      const newSettings = { ...state.settings, ...action.settings };
-      saveSettings(newSettings);
-      return { ...state, settings: newSettings };
+      const merged: Settings = {
+        ...state.settings,
+        ...action.settings,
+        image: { ...state.settings.image, ...action.settings.image },
+        audio: { ...state.settings.audio, ...action.settings.audio },
+        video: { ...state.settings.video, ...action.settings.video },
+        code:  { ...state.settings.code,  ...action.settings.code  },
+      };
+      saveSettings(merged);
+      return { ...state, settings: merged };
     }
 
     default:
@@ -139,13 +121,10 @@ function App() {
         setBatchResult(null);
       }
       dispatch({ type: "START_BATCH" });
-
       const result = await squishFiles(paths);
-      if (result) {
-        setBatchResult(result);
-      }
+      if (result) setBatchResult(result);
     },
-    [state.status, squishFiles]
+    [state.status, squishFiles],
   );
 
   const handleSettingsChange = useCallback((update: Partial<Settings>) => {
