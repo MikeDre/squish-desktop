@@ -4,6 +4,8 @@ import { FileList } from "./components/FileList";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { useSquish } from "./hooks/useSquish";
 import { useTheme } from "./hooks/useTheme";
+import { useFfmpegStatus } from "./hooks/useFfmpegStatus";
+import { detectFamilyFromExtension } from "./lib/families";
 import { migrateSettings, saveSettings } from "./lib/settings/migrate";
 import type {
   AppState,
@@ -11,6 +13,7 @@ import type {
   Settings,
   BatchResult,
   FileEntry,
+  Family,
 } from "./types";
 import "./App.css";
 
@@ -114,6 +117,19 @@ function App() {
   const [batchResult, setBatchResult] = useState<BatchResult | null>(null);
   const { squishFiles } = useSquish(dispatch, state.settings);
   const { effectiveTheme, cycleTheme, theme } = useTheme();
+  const ffmpeg = useFfmpegStatus();
+
+  const queueFamilies = (() => {
+    const set = new Set<Family>();
+    for (const f of state.files) {
+      if (f.family) set.add(f.family);
+      else {
+        const fam = detectFamilyFromExtension(f.filename);
+        if (fam) set.add(fam);
+      }
+    }
+    return set;
+  })();
 
   const handleDrop = useCallback(
     async (paths: string[]) => {
@@ -144,7 +160,12 @@ function App() {
         </button>
       </div>
       <DropZone status={state.status} onDrop={handleDrop} />
-      <SettingsPanel settings={state.settings} onChange={handleSettingsChange} />
+      <SettingsPanel
+        settings={state.settings}
+        onChange={handleSettingsChange}
+        queueFamilies={queueFamilies}
+        ffmpegAvailable={ffmpeg.ffmpeg && ffmpeg.ffprobe}
+      />
       <FileList files={state.files} batchResult={batchResult} />
     </div>
   );
