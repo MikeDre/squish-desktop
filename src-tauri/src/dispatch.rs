@@ -43,7 +43,6 @@ impl std::fmt::Display for UnifiedError {
 }
 
 // Consumed by the dispatcher in Task 6+.
-#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct UnifiedResult {
     pub input_bytes: u64,
@@ -167,6 +166,78 @@ impl From<squish_code::CodeError> for UnifiedError {
     }
 }
 
+use crate::options::BatchOptionsPayload;
+
+/// Dispatch a single file to the right crate based on its kind.
+///
+/// `ffmpeg_ok` short-circuits audio/video when the system dependency is missing,
+/// avoiding redundant per-file probes inside the crates.
+pub fn run_one(
+    path: &Path,
+    opts: &BatchOptionsPayload,
+    ffmpeg_ok: bool,
+) -> Result<UnifiedResult, UnifiedError> {
+    match detect_kind(path) {
+        FileKind::Image => {
+            let o = opts.image.to_options(opts.force_overwrite);
+            squish_core::squish_file(path, &o)
+                .map(|r| UnifiedResult {
+                    input_bytes: r.input_bytes,
+                    output_bytes: r.output_bytes,
+                    output_path: r.output_path,
+                    duration: r.duration,
+                    warnings: vec![],
+                })
+                .map_err(Into::into)
+        }
+        FileKind::Audio => {
+            if !ffmpeg_ok {
+                return Err(UnifiedError::MissingDependency { tool: "ffmpeg".into() });
+            }
+            let o = opts.audio.to_options(opts.force_overwrite);
+            squish_audio::squish_audio(path, &o)
+                .map(|r| UnifiedResult {
+                    input_bytes: r.input_bytes,
+                    output_bytes: r.output_bytes,
+                    output_path: r.output_path,
+                    duration: r.duration,
+                    warnings: vec![],
+                })
+                .map_err(Into::into)
+        }
+        FileKind::Video => {
+            if !ffmpeg_ok {
+                return Err(UnifiedError::MissingDependency { tool: "ffmpeg".into() });
+            }
+            let o = opts.video.to_options(opts.force_overwrite);
+            squish_video::squish_video(path, &o)
+                .map(|r| UnifiedResult {
+                    input_bytes: r.input_bytes,
+                    output_bytes: r.output_bytes,
+                    output_path: r.output_path,
+                    duration: r.duration,
+                    warnings: vec![],
+                })
+                .map_err(Into::into)
+        }
+        FileKind::Code => {
+            let o = opts.code.to_options(opts.force_overwrite);
+            squish_code::squish_code(path, &o)
+                .map(|r| UnifiedResult {
+                    input_bytes: r.input_bytes,
+                    output_bytes: r.output_bytes,
+                    output_path: r.output_path,
+                    duration: r.duration,
+                    warnings: vec![],
+                })
+                .map_err(Into::into)
+        }
+        FileKind::Unknown => Err(UnifiedError::Unsupported {
+            reason: format!("unrecognised file: {}", path.display()),
+        }),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -264,5 +335,48 @@ mod tests {
         let png_magic: [u8; 8] = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
         fs::write(&p, png_magic).unwrap();
         assert_eq!(detect_kind(&p), FileKind::Image);
+    }
+
+    use crate::options::{BatchOptionsPayload, CodeOptionsPayload};
+
+    #[test]
+    fn run_one_routes_code_file_and_returns_unified_result() {
+        let tmp = TempDir::new().unwrap();
+        let p = tmp.path().join("a.json");
+        fs::write(&p, br#"{"a":   1   }"#).unwrap();
+
+        let opts = BatchOptionsPayload {
+            code: CodeOptionsPayload { source_map: false, suffix: Some("min".into()) },
+            force_overwrite: false,
+            ..Default::default()
+        };
+        let ffmpeg_ok = false; // irrelevant for code
+        let result = run_one(&p, &opts, ffmpeg_ok).expect("code run should succeed");
+
+        assert!(result.input_bytes > 0);
+        assert!(result.output_bytes <= result.input_bytes);
+        assert!(result.output_path.exists());
+    }
+
+    #[test]
+    fn run_one_missing_ffmpeg_for_audio_returns_missing_dependency() {
+        let tmp = TempDir::new().unwrap();
+        let p = tmp.path().join("a.mp3");
+        // Minimal ID3 header so detect_audio_format identifies it as mp3 by ext/magic.
+        fs::write(&p, b"ID3\x03\x00\x00\x00\x00\x00\x00").unwrap();
+
+        let opts = BatchOptionsPayload::default();
+        let err = run_one(&p, &opts, /* ffmpeg_ok */ false).unwrap_err();
+        assert!(matches!(err, UnifiedError::MissingDependency { ref tool } if tool == "ffmpeg"));
+    }
+
+    #[test]
+    fn run_one_unknown_kind_returns_unsupported() {
+        let tmp = TempDir::new().unwrap();
+        let p = tmp.path().join("mystery.xyz");
+        fs::write(&p, b"random").unwrap();
+
+        let err = run_one(&p, &BatchOptionsPayload::default(), false).unwrap_err();
+        assert!(matches!(err, UnifiedError::Unsupported { .. }));
     }
 }
