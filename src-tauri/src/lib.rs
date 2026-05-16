@@ -1,4 +1,7 @@
 mod commands;
+mod dispatch;
+mod ffmpeg;
+mod options;
 
 use tauri::{
     menu::{Menu, MenuItem},
@@ -55,11 +58,15 @@ pub fn run() {
                 }
             });
 
+            // Probe ffmpeg/ffprobe at startup
+            ffmpeg::probe_and_cache();
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             commands::get_version,
             commands::squish_files,
+            ffmpeg::check_ffmpeg,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

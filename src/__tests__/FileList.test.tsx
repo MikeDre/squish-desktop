@@ -34,6 +34,12 @@ const batchResult: BatchResult = {
   total_input_bytes: 150_000,
   total_output_bytes: 70_000,
   total_duration_ms: 800,
+  by_family: {
+    image: { total: 2, success: 2, error: 0, skipped: 0 },
+    audio: { total: 0, success: 0, error: 0, skipped: 0 },
+    video: { total: 0, success: 0, error: 0, skipped: 0 },
+    code: { total: 0, success: 0, error: 0, skipped: 0 },
+  },
 };
 
 describe("FileList", () => {

@@ -71,4 +71,34 @@ describe("FileRow", () => {
     render(<FileRow file={error} />);
     expect(screen.queryByRole("button", { name: /show in finder/i })).not.toBeInTheDocument();
   });
+
+  it("renders family icon for a done file", () => {
+    render(<FileRow file={{
+      id: '1', filename: 'a.mp3', path: '/a.mp3', family: 'audio',
+      status: 'done', inputBytes: 100, outputBytes: 50,
+      reductionPercent: 50, outputPath: '/a-squished.mp3', durationMs: 100,
+      warnings: [],
+    }} />);
+    // FAMILY_META.audio.icon
+    expect(screen.getByText('♪')).toBeInTheDocument();
+  });
+
+  it("shows warnings chip when warnings present", () => {
+    render(<FileRow file={{
+      id: '1', filename: 'a.webp', path: '/a.webp', family: 'image',
+      status: 'done', inputBytes: 100, outputBytes: 100,
+      reductionPercent: 0, outputPath: '/a-squished.webp', durationMs: 10,
+      warnings: ['animated WebP passed through'],
+    }} />);
+    expect(screen.getByLabelText(/1 warning/)).toBeInTheDocument();
+  });
+
+  it("shows Install ffmpeg action for missing_dependency error", () => {
+    render(<FileRow file={{
+      id: '1', filename: 'a.mp3', path: '/a.mp3', family: 'audio',
+      status: 'error', error: 'missing dependency: ffmpeg',
+      errorKind: 'missing_dependency',
+    }} />);
+    expect(screen.getByRole('button', { name: /Install ffmpeg/i })).toBeInTheDocument();
+  });
 });
