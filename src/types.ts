@@ -20,6 +20,15 @@ export interface FileErrorPayload {
   error: string;
 }
 
+export type Family = 'image' | 'audio' | 'video' | 'code';
+
+export interface FamilyStats {
+  total: number;
+  success: number;
+  error: number;
+  skipped: number;
+}
+
 export interface BatchResult {
   total_files: number;
   success_count: number;
@@ -28,6 +37,7 @@ export interface BatchResult {
   total_input_bytes: number;
   total_output_bytes: number;
   total_duration_ms: number;
+  by_family: Record<Family, FamilyStats>;
 }
 
 // --- Frontend state ---

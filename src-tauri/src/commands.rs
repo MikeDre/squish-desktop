@@ -36,6 +36,22 @@ pub struct FileErrorEvent {
     pub error: String,
 }
 
+#[derive(Serialize, Default, Clone)]
+pub struct FamilyStats {
+    pub total: usize,
+    pub success: usize,
+    pub error: usize,
+    pub skipped: usize,
+}
+
+#[derive(Serialize, Default)]
+pub struct ByFamily {
+    pub image: FamilyStats,
+    pub audio: FamilyStats,
+    pub video: FamilyStats,
+    pub code: FamilyStats,
+}
+
 #[derive(Serialize)]
 pub struct BatchResult {
     pub total_files: usize,
@@ -45,6 +61,7 @@ pub struct BatchResult {
     pub total_input_bytes: u64,
     pub total_output_bytes: u64,
     pub total_duration_ms: u64,
+    pub by_family: ByFamily,
 }
 
 #[tauri::command]
@@ -193,14 +210,26 @@ pub async fn squish_files(
         }
     }
 
+    let success = success_count.load(Ordering::SeqCst);
+    let errors = error_count.load(Ordering::SeqCst);
+
     Ok(BatchResult {
         total_files: all_files.len(),
-        success_count: success_count.load(Ordering::SeqCst),
-        error_count: error_count.load(Ordering::SeqCst),
+        success_count: success,
+        error_count: errors,
         skipped_count,
         total_input_bytes: total_input.load(Ordering::SeqCst),
         total_output_bytes: total_output.load(Ordering::SeqCst),
         total_duration_ms: start.elapsed().as_millis() as u64,
+        by_family: ByFamily {
+            image: FamilyStats {
+                total: success + errors,
+                success,
+                error: errors,
+                skipped: 0,
+            },
+            ..ByFamily::default()
+        },
     })
 }
 
