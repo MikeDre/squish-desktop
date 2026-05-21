@@ -1,26 +1,40 @@
+// --- Family taxonomy ---
+export type Family = 'image' | 'audio' | 'video' | 'code';
+
+// --- Error kinds (mirrors UnifiedError variants in Rust dispatch.rs) ---
+export type ErrorKind =
+  | 'missing_dependency'
+  | 'unsupported'
+  | 'parse_failed'
+  | 'io'
+  | 'other';
+
 // --- Tauri event payloads (must match Rust structs in commands.rs) ---
 
 export interface FileStartPayload {
   id: string;
   path: string;
   filename: string;
+  family: Family;
 }
 
 export interface FileDonePayload {
   id: string;
+  family: Family;
   input_bytes: number;
   output_bytes: number;
   output_path: string;
   reduction_percent: number;
   duration_ms: number;
+  warnings: string[];
 }
 
 export interface FileErrorPayload {
   id: string;
+  family: Family;
+  kind: ErrorKind;
   error: string;
 }
-
-export type Family = 'image' | 'audio' | 'video' | 'code';
 
 export interface FamilyStats {
   total: number;
@@ -37,7 +51,12 @@ export interface BatchResult {
   total_input_bytes: number;
   total_output_bytes: number;
   total_duration_ms: number;
-  by_family: Record<Family, FamilyStats>;
+  by_family: {
+    image: FamilyStats;
+    audio: FamilyStats;
+    video: FamilyStats;
+    code: FamilyStats;
+  };
 }
 
 // --- Frontend state ---
@@ -48,24 +67,58 @@ export interface FileEntry {
   id: string;
   filename: string;
   path: string;
+  family?: Family;
   status: FileStatus;
   inputBytes?: number;
   outputBytes?: number;
   reductionPercent?: number;
   outputPath?: string;
   durationMs?: number;
+  warnings?: string[];
   error?: string;
+  errorKind?: ErrorKind;
+}
+
+// --- Per-family settings ---
+
+export interface ImageSettings {
+  quality: number | null;
+  lossless: boolean;
+  format: string | null;
+  maxWidth: number | null;
+  maxHeight: number | null;
+  suffix: string | null;
+}
+
+export type AudioCodec = 'copy' | 'mp3' | 'opus' | 'aac' | 'flac' | 'vorbis';
+
+export interface AudioSettings {
+  codec: AudioCodec | null;
+  bitrateKbps: number | null;
+  suffix: string | null;
+}
+
+export interface VideoSettings {
+  codec: string | null;
+  crf: number | null;
+  preset: string | null;
+  suffix: string | null;
+}
+
+export interface CodeSettings {
+  sourceMap: boolean;
+  suffix: string | null;
 }
 
 export interface Settings {
-  quality: number | null;  // null = format default
-  lossless: boolean;
-  format: string | null;   // null = preserve input format
   recursive: boolean;
-  maxWidth: number | null;
-  maxHeight: number | null;
-  suffix: string | null;   // null = backend default ("squished")
+  image: ImageSettings;
+  audio: AudioSettings;
+  video: VideoSettings;
+  code: CodeSettings;
 }
+
+// --- App state ---
 
 export type AppStatus = 'idle' | 'processing' | 'done';
 
@@ -82,20 +135,45 @@ export type AppAction =
   | { type: 'START_BATCH' }
   | { type: 'FILE_START'; payload: FileStartPayload }
   | { type: 'FILE_DONE'; payload: FileDonePayload }
-  | { type: 'FILE_ERROR'; id: string; error: string }
+  | { type: 'FILE_ERROR'; payload: FileErrorPayload }
   | { type: 'BATCH_COMPLETE' }
   | { type: 'UPDATE_SETTINGS'; settings: Partial<Settings> };
 
-// --- Settings defaults ---
+// --- Defaults ---
 
-export const DEFAULT_SETTINGS: Settings = {
+export const DEFAULT_IMAGE: ImageSettings = {
   quality: null,
   lossless: false,
   format: null,
-  recursive: false,
   maxWidth: null,
   maxHeight: null,
   suffix: null,
+};
+
+export const DEFAULT_AUDIO: AudioSettings = {
+  codec: null,
+  bitrateKbps: null,
+  suffix: null,
+};
+
+export const DEFAULT_VIDEO: VideoSettings = {
+  codec: null,
+  crf: null,
+  preset: null,
+  suffix: null,
+};
+
+export const DEFAULT_CODE: CodeSettings = {
+  sourceMap: false,
+  suffix: null,
+};
+
+export const DEFAULT_SETTINGS: Settings = {
+  recursive: false,
+  image: DEFAULT_IMAGE,
+  audio: DEFAULT_AUDIO,
+  video: DEFAULT_VIDEO,
+  code: DEFAULT_CODE,
 };
 
 export const FORMAT_OPTIONS = [
@@ -107,6 +185,16 @@ export const FORMAT_OPTIONS = [
   { value: 'svg', label: 'SVG' },
   { value: 'gif', label: 'GIF' },
   { value: 'heic', label: 'HEIC' },
+] as const;
+
+export const AUDIO_CODEC_OPTIONS = [
+  { value: '', label: 'Auto (preserve / Opus)' },
+  { value: 'copy', label: 'Copy (no re-encode)' },
+  { value: 'mp3', label: 'MP3' },
+  { value: 'opus', label: 'Opus' },
+  { value: 'aac', label: 'AAC' },
+  { value: 'flac', label: 'FLAC (lossless)' },
+  { value: 'vorbis', label: 'Vorbis' },
 ] as const;
 
 // --- Theme types ---

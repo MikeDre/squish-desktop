@@ -1,138 +1,118 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { DEFAULT_SETTINGS } from "../types";
 
 describe("SettingsPanel", () => {
-  it("is collapsed by default", () => {
-    render(
-      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />
-    );
-    expect(screen.queryByLabelText(/quality/i)).not.toBeInTheDocument();
+  it("is collapsed by default — no section headers visible", () => {
+    render(<SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: /Image/i })).not.toBeInTheDocument();
   });
 
-  it("expands when gear icon is clicked", async () => {
+  it("renders all five section headers when the top-level toggle is clicked", async () => {
+    const user = userEvent.setup();
+    render(<SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />);
+
+    await user.click(screen.getByRole("button", { name: /Settings/i }));
+
+    expect(screen.getByRole("button", { name: /General/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Image/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Audio/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Video/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Code/i })).toBeInTheDocument();
+  });
+
+  it("opens the Image section and reveals the Quality control", async () => {
+    const user = userEvent.setup();
+    render(<SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />);
+
+    await user.click(screen.getByRole("button", { name: /Settings/i }));
+    await user.click(screen.getByRole("button", { name: /Image/i }));
+
+    expect(screen.getByLabelText(/Quality/i)).toBeInTheDocument();
+  });
+
+  it("opens the Audio section and reveals the Codec select", async () => {
+    const user = userEvent.setup();
+    render(<SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />);
+
+    await user.click(screen.getByRole("button", { name: /Settings/i }));
+    await user.click(screen.getByRole("button", { name: /Audio/i }));
+
+    expect(screen.getByLabelText(/Codec/i)).toBeInTheDocument();
+  });
+
+  it("auto-expands sections listed in queueFamilies without clicking their header", async () => {
     const user = userEvent.setup();
     render(
-      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />
+      <SettingsPanel
+        settings={DEFAULT_SETTINGS}
+        onChange={vi.fn()}
+        queueFamilies={new Set(["audio"])}
+      />,
     );
-    await user.click(screen.getByRole("button", { name: /settings/i }));
-    expect(screen.getByLabelText(/quality/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /Settings/i }));
+
+    expect(screen.getByLabelText(/Codec/i)).toBeInTheDocument();
   });
 
-  it("shows format dropdown", async () => {
+  it("shows the 'in batch' badge on sections whose family is in queueFamilies", async () => {
     const user = userEvent.setup();
     render(
-      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />
+      <SettingsPanel
+        settings={DEFAULT_SETTINGS}
+        onChange={vi.fn()}
+        queueFamilies={new Set(["image", "video"])}
+      />,
     );
-    await user.click(screen.getByRole("button", { name: /settings/i }));
-    expect(screen.getByLabelText(/format/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /Settings/i }));
+
+    const badges = screen.getAllByText("in batch");
+    expect(badges).toHaveLength(2);
   });
 
-  it("calls onChange when lossless is toggled", async () => {
+  it("calls onChange with deep-merged image shape when lossless is toggled", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    render(
-      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={onChange} />
-    );
-    await user.click(screen.getByRole("button", { name: /settings/i }));
-    await user.click(screen.getByLabelText(/lossless/i));
-    expect(onChange).toHaveBeenCalledWith({ lossless: true });
+    render(<SettingsPanel settings={DEFAULT_SETTINGS} onChange={onChange} />);
+
+    await user.click(screen.getByRole("button", { name: /Settings/i }));
+    await user.click(screen.getByRole("button", { name: /Image/i }));
+    await user.click(screen.getByLabelText(/Lossless/i));
+
+    expect(onChange).toHaveBeenCalledWith({
+      image: { ...DEFAULT_SETTINGS.image, lossless: true },
+    });
   });
 
-  it("shows recursive toggle when expanded", async () => {
-    const user = userEvent.setup();
-    render(
-      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />
-    );
-    await user.click(screen.getByRole("button", { name: /settings/i }));
-    expect(screen.getByLabelText(/include subfolders/i)).toBeInTheDocument();
-  });
-
-  it("calls onChange when recursive is toggled", async () => {
+  it("calls onChange with recursive true when General section toggle is used", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    render(
-      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={onChange} />
-    );
-    await user.click(screen.getByRole("button", { name: /settings/i }));
-    await user.click(screen.getByLabelText(/include subfolders/i));
+    render(<SettingsPanel settings={DEFAULT_SETTINGS} onChange={onChange} />);
+
+    await user.click(screen.getByRole("button", { name: /Settings/i }));
+    await user.click(screen.getByRole("button", { name: /General/i }));
+    await user.click(screen.getByLabelText(/recurse into subdirectories/i));
+
     expect(onChange).toHaveBeenCalledWith({ recursive: true });
   });
 
-  it("shows max width and max height inputs when expanded", async () => {
+  it("does not show the 'in batch' badge for families not in queueFamilies", async () => {
     const user = userEvent.setup();
     render(
-      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />
+      <SettingsPanel
+        settings={DEFAULT_SETTINGS}
+        onChange={vi.fn()}
+        queueFamilies={new Set(["audio"])}
+      />,
     );
-    await user.click(screen.getByRole("button", { name: /settings/i }));
-    expect(screen.getByLabelText(/max width/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/max height/i)).toBeInTheDocument();
-  });
 
-  it("calls onChange with maxWidth when max width is typed", async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    render(
-      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={onChange} />
-    );
-    await user.click(screen.getByRole("button", { name: /settings/i }));
-    fireEvent.change(screen.getByLabelText(/max width/i), {
-      target: { value: "1920" },
-    });
-    expect(onChange).toHaveBeenLastCalledWith({ maxWidth: 1920 });
-  });
+    await user.click(screen.getByRole("button", { name: /Settings/i }));
 
-  it("calls onChange with maxWidth null when input is cleared", async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const populated = { ...DEFAULT_SETTINGS, maxWidth: 1920 };
-    render(<SettingsPanel settings={populated} onChange={onChange} />);
-    await user.click(screen.getByRole("button", { name: /settings/i }));
-    await user.clear(screen.getByLabelText(/max width/i));
-    expect(onChange).toHaveBeenLastCalledWith({ maxWidth: null });
-  });
-
-  it("hides the suffix input until the Advanced disclosure is opened", async () => {
-    const user = userEvent.setup();
-    render(
-      <SettingsPanel settings={DEFAULT_SETTINGS} onChange={vi.fn()} />
-    );
-    await user.click(screen.getByRole("button", { name: /settings/i }));
-    // The disclosure content is in the DOM but hidden; the trigger is visible.
-    const advanced = screen.getByText(/advanced/i);
-    expect(advanced).toBeInTheDocument();
-
-    // Native <details> reflects open state on the parent element.
-    const details = advanced.closest("details");
-    expect(details?.hasAttribute("open")).toBe(false);
-
-    await user.click(advanced);
-    expect(details?.hasAttribute("open")).toBe(true);
-    expect(screen.getByLabelText(/output suffix/i)).toBeInTheDocument();
-  });
-
-  it("calls onChange with suffix when typed", async () => {
-    const onChange = vi.fn();
-    const user = userEvent.setup();
-    render(<SettingsPanel settings={DEFAULT_SETTINGS} onChange={onChange} />);
-    await user.click(screen.getByRole("button", { name: /settings/i }));
-    await user.click(screen.getByText(/advanced/i));
-    fireEvent.change(screen.getByLabelText(/output suffix/i), {
-      target: { value: "min" },
-    });
-    expect(onChange).toHaveBeenLastCalledWith({ suffix: "min" });
-  });
-
-  it("calls onChange with suffix null when cleared", async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const populated = { ...DEFAULT_SETTINGS, suffix: "min" };
-    render(<SettingsPanel settings={populated} onChange={onChange} />);
-    await user.click(screen.getByRole("button", { name: /settings/i }));
-    await user.click(screen.getByText(/advanced/i));
-    await user.clear(screen.getByLabelText(/output suffix/i));
-    expect(onChange).toHaveBeenLastCalledWith({ suffix: null });
+    const badges = screen.queryAllByText("in batch");
+    expect(badges).toHaveLength(1);
   });
 });

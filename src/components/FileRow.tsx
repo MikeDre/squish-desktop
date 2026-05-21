@@ -1,4 +1,5 @@
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
+import { FAMILY_META } from "../lib/families";
 import type { FileEntry } from "../types";
 import "./FileRow.css";
 
@@ -26,7 +27,17 @@ export function FileRow({ file }: FileRowProps) {
   return (
     <div className={`file-row file-row--${file.status}`}>
       <div className="file-row__status-dot" />
-      <div className="file-row__name">{file.filename}</div>
+      <div className="file-row__name">
+        {file.family && (
+          <span
+            className={`file-row__family file-row__family--${file.family}`}
+            title={FAMILY_META[file.family].label}
+          >
+            {FAMILY_META[file.family].icon}
+          </span>
+        )}
+        {file.filename}
+      </div>
 
       {(file.status === "pending" || file.status === "compressing") && (
         <div className="file-row__progress">
@@ -60,11 +71,32 @@ export function FileRow({ file }: FileRowProps) {
               ↗
             </button>
           )}
+          {file.warnings && file.warnings.length > 0 && (
+            <span
+              className="file-row__warnings"
+              title={file.warnings.join('\n')}
+              aria-label={`${file.warnings.length} warning${file.warnings.length === 1 ? '' : 's'}`}
+            >
+              ⚠ {file.warnings.length}
+            </span>
+          )}
         </div>
       )}
 
       {file.status === "error" && (
-        <div className="file-row__error">{file.error}</div>
+        <div className="file-row__error">
+          {file.error}
+          {file.errorKind === 'missing_dependency' && (
+            <button
+              className="file-row__missing-dep"
+              onClick={() => {
+                document.querySelector('.ffmpeg-onboarding')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Install ffmpeg →
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

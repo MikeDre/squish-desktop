@@ -1,0 +1,17 @@
+.image-settings { display: flex; flex-direction: column; gap: 12px; }
+.image-settings__field { display: flex; flex-direction: column; gap: 4px; }
+.image-settings__row { display: flex; gap: 12px; }
+.image-settings__row .image-settings__field { flex: 1; }
+.image-settings__quality-row { display: flex; align-items: center; gap: 8px; }
+.image-settings__quality-value { font-variant-numeric: tabular-nums; min-width: 3ch; color: var(--text-secondary); }
+.image-settings input[type="text"],
+.image-settings input[type="number"],
+.image-settings select {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-primary);
+}
