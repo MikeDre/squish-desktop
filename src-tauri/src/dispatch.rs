@@ -120,11 +120,12 @@ impl From<squish_core::SquishError> for UnifiedError {
     }
 }
 
-impl From<squish_audio::AudioError> for UnifiedError {
-    fn from(e: squish_audio::AudioError) -> Self {
-        use squish_audio::AudioError as E;
+// In v0.4.0, squish_audio::AudioError and squish_video::VideoError are both
+// re-exports of squish_media::MediaError — a single From impl covers both.
+impl From<squish_media::MediaError> for UnifiedError {
+    fn from(e: squish_media::MediaError) -> Self {
+        use squish_media::MediaError as E;
         match e {
-            // Real field names: `name` and `install_hint` (not `tool`/`hint`)
             E::MissingDependency { name, .. } => {
                 UnifiedError::MissingDependency { tool: name }
             }
@@ -133,23 +134,14 @@ impl From<squish_audio::AudioError> for UnifiedError {
                 reason: format!("not an audio file: {}", path.display()),
             },
             E::InvalidOption { reason } => UnifiedError::Unsupported { reason },
+            E::FfmpegFailed { stderr, .. } => UnifiedError::Other(stderr),
+            E::InPlaceFormatChange { path, from, to } => UnifiedError::Unsupported {
+                reason: format!(
+                    "cannot overwrite {} in place: output format .{to} differs from input .{from}",
+                    path.display()
+                ),
+            },
             E::Io(io) => UnifiedError::Io(io.to_string()),
-            other => UnifiedError::Other(format!("{other}")),
-        }
-    }
-}
-
-impl From<squish_video::VideoError> for UnifiedError {
-    fn from(e: squish_video::VideoError) -> Self {
-        use squish_video::VideoError as E;
-        match e {
-            // Real field names: `name` and `install_hint` (not `tool`)
-            E::MissingDependency { name, .. } => {
-                UnifiedError::MissingDependency { tool: name }
-            }
-            E::UnsupportedFormat { reason, .. } => UnifiedError::Unsupported { reason },
-            E::Io(io) => UnifiedError::Io(io.to_string()),
-            other => UnifiedError::Other(format!("{other}")),
         }
     }
 }
@@ -186,7 +178,7 @@ pub fn run_one(
                     output_bytes: r.output_bytes,
                     output_path: r.output_path,
                     duration: r.duration,
-                    warnings: vec![],
+                    warnings: r.warnings,
                 })
                 .map_err(Into::into)
         }

@@ -66,6 +66,8 @@ impl ImageOptionsPayload {
             max_width: self.max_width.filter(|&w| w > 0),
             max_height: self.max_height.filter(|&h| h > 0),
             suffix: normalize_suffix(self.suffix.as_deref()),
+            overwrite: false,
+            target_size: None,
         }
     }
 }
