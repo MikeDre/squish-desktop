@@ -121,7 +121,7 @@ impl From<squish_core::SquishError> for UnifiedError {
 }
 
 // In v0.4.0, squish_audio::AudioError and squish_video::VideoError are both
-// re-exports of squish_media::MediaError — a single From impl covers both.
+// `pub use` re-exports of squish_media::MediaError — a single From impl covers both.
 impl From<squish_media::MediaError> for UnifiedError {
     fn from(e: squish_media::MediaError) -> Self {
         use squish_media::MediaError as E;
@@ -193,6 +193,7 @@ pub fn run_one(
                     output_bytes: r.output_bytes,
                     output_path: r.output_path,
                     duration: r.duration,
+                    // Audio/video/code results carry no warnings in v0.4.0 — only SquishResult (images) does.
                     warnings: vec![],
                 })
                 .map_err(Into::into)
@@ -244,14 +245,37 @@ mod tests {
     }
 
     #[test]
-    fn audio_missing_dep_maps_to_missing_dependency() {
-        // Real AudioError::MissingDependency fields are `name` and `install_hint`
-        let e = squish_audio::AudioError::MissingDependency {
+    fn media_missing_dep_maps_to_missing_dependency() {
+        // Exercises the unified MediaError → UnifiedError mapping introduced in v0.4.0.
+        let e = squish_media::MediaError::MissingDependency {
             name: "ffmpeg".into(),
             install_hint: String::new(),
         };
         let u: UnifiedError = e.into();
         assert!(matches!(u, UnifiedError::MissingDependency { tool } if tool == "ffmpeg"));
+    }
+
+    #[test]
+    fn media_ffmpeg_failed_maps_to_other_with_stderr() {
+        // FfmpegFailed { path, stderr } — stderr text must be preserved in UnifiedError::Other.
+        let e = squish_media::MediaError::FfmpegFailed {
+            path: std::path::PathBuf::from("/a.mp3"),
+            stderr: "codec not found".into(),
+        };
+        let u: UnifiedError = e.into();
+        assert!(matches!(u, UnifiedError::Other(ref msg) if msg == "codec not found"));
+    }
+
+    #[test]
+    fn media_in_place_format_change_maps_to_unsupported() {
+        // InPlaceFormatChange { path, from, to } — must map to UnifiedError::Unsupported.
+        let e = squish_media::MediaError::InPlaceFormatChange {
+            path: std::path::PathBuf::from("/clip.dv"),
+            from: "dv".into(),
+            to: "mp4".into(),
+        };
+        let u: UnifiedError = e.into();
+        assert!(matches!(u, UnifiedError::Unsupported { .. }));
     }
 
     #[test]
