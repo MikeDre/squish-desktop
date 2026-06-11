@@ -1,0 +1,77 @@
+<h2>How much should the aurora move?</h2>
+<p class="subtitle">Ember palette, dark theme. These are live — watch each one for a few seconds. All motion would respect <code>prefers-reduced-motion</code>.</p>
+
+<style>
+  .mo-row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .mo-card { flex: 1 1 280px; max-width: 340px; cursor: pointer; border-radius: 16px; border: 2px solid transparent; transition: border-color .2s; }
+  .mo-card.selected { border-color: #FF6B35; }
+  .mw { border-radius: 13px; overflow: hidden; box-shadow: 0 14px 34px rgba(0,0,0,.30); font-size: 11px; color: #fff; position: relative; background: linear-gradient(165deg, #1c1424 0%, #2c1a2e 55%, #3a1f26 100%); }
+  .blob { position: absolute; border-radius: 50%; filter: blur(30px); pointer-events: none; }
+  .b1 { width: 160px; height: 130px; left: -30px; top: -30px; background: rgba(255,107,53,.55); }
+  .b2 { width: 140px; height: 120px; right: -25px; top: 20px; background: rgba(176,58,108,.5); }
+  .b3 { width: 180px; height: 110px; left: 25%; bottom: -40px; background: rgba(255,140,90,.38); }
+  .chrome { position: relative; z-index: 1; }
+  .tb { display: flex; align-items: center; gap: 5px; padding: 7px 10px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .dot.r { background:#ff5f57 } .dot.y { background:#febc2e } .dot.g { background:#28c840 }
+  .bd { padding: 11px; display: flex; flex-direction: column; gap: 9px; }
+  .dz { border-radius: 10px; padding: 14px 8px; text-align: center; font-weight: 600; background: rgba(255,255,255,0.08); border: 1.5px dashed rgba(255,255,255,0.35); backdrop-filter: blur(12px); }
+  .dz small { display:block; font-weight:400; opacity:.65; margin-top:2px; }
+  .fr { border-radius: 8px; padding: 7px 10px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.16); box-shadow: inset 0 1px 0 rgba(255,255,255,.18); backdrop-filter: blur(12px); }
+  .pill { border-radius: 99px; padding: 2px 8px; font-weight: 600; font-size: 10px; background: rgba(52,199,89,0.3); color: #d8ffe3; }
+  .prog { height: 4px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; flex: 1; margin: 0 10px; }
+  .prog i { display: block; height: 100%; width: 40%; border-radius: 99px; background: linear-gradient(90deg, #FF6B35, #FF9A6B); animation: fill 2.4s ease-in-out infinite; }
+  @keyframes fill { 0% { width: 8% } 70% { width: 92% } 100% { width: 92%; opacity: .4 } }
+
+  /* B — drift */
+  .drift .b1 { animation: d1 14s ease-in-out infinite alternate; }
+  .drift .b2 { animation: d2 17s ease-in-out infinite alternate; }
+  .drift .b3 { animation: d3 21s ease-in-out infinite alternate; }
+  @keyframes d1 { from { transform: translate(0,0) scale(1) } to { transform: translate(45px,25px) scale(1.18) } }
+  @keyframes d2 { from { transform: translate(0,0) scale(1) } to { transform: translate(-35px,30px) scale(.92) } }
+  @keyframes d3 { from { transform: translate(0,0) scale(1) } to { transform: translate(30px,-22px) scale(1.12) } }
+
+  /* C — reactive: drift + heat-up pulse while compressing */
+  .reactive .b1 { animation: d1 14s ease-in-out infinite alternate, heat 2.4s ease-in-out infinite; }
+  .reactive .b2 { animation: d2 17s ease-in-out infinite alternate, heat 2.4s ease-in-out infinite .3s; }
+  .reactive .b3 { animation: d3 21s ease-in-out infinite alternate, heat 2.4s ease-in-out infinite .6s; }
+  @keyframes heat { 0%,100% { opacity: .75 } 55% { opacity: 1.0; filter: blur(26px) } }
+</style>
+
+<div class="mo-row options" data-nostyle>
+  <div class="mo-card option" data-choice="static" onclick="toggleSelect(this)">
+    <div class="mw">
+      <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+      <div class="chrome"><div class="tb"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+      <div class="bd"><div class="dz">Drop files to squish<small>images · video · audio · code</small></div>
+      <div class="fr"><span>hero.png → webp</span><span class="pill">−72%</span></div>
+      <div class="fr"><span>trailer.mov</span><span class="pill">−54%</span></div></div></div>
+    </div>
+    <div class="content" style="padding:14px 16px"><h3>A · Still</h3>
+      <p>The aurora is a painting — zero motion, zero distraction, zero GPU cost. Glass and glow do all the work.</p></div>
+  </div>
+
+  <div class="mo-card option" data-choice="drift" onclick="toggleSelect(this)">
+    <div class="mw drift">
+      <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+      <div class="chrome"><div class="tb"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+      <div class="bd"><div class="dz">Drop files to squish<small>images · video · audio · code</small></div>
+      <div class="fr"><span>hero.png → webp</span><span class="pill">−72%</span></div>
+      <div class="fr"><span>trailer.mov</span><span class="pill">−54%</span></div></div></div>
+    </div>
+    <div class="content" style="padding:14px 16px"><h3>B · Slow drift</h3>
+      <p>The glows wander on a 15–20s cycle — barely perceptible, but the app feels alive. Pure CSS transforms, GPU-composited.</p></div>
+  </div>
+
+  <div class="mo-card option" data-choice="reactive" onclick="toggleSelect(this)">
+    <div class="mw reactive">
+      <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+      <div class="chrome"><div class="tb"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+      <div class="bd"><div class="dz">Drop files to squish<small>images · video · audio · code</small></div>
+      <div class="fr"><span>compressing trailer.mov…</span><span class="prog"><i></i></span></div>
+      <div class="fr"><span>hero.png → webp</span><span class="pill">−72%</span></div></div></div>
+    </div>
+    <div class="content" style="padding:14px 16px"><h3>C · Reactive</h3>
+      <p>Slow drift at idle, and the aurora "heats up" — glows brighten and breathe — while a batch is compressing, then settles when done. Motion tied to what the app is doing.</p></div>
+  </div>
+</div>
