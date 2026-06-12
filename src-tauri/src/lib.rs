@@ -6,7 +6,7 @@ mod options;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
-    Manager,
+    Manager, WebviewUrl, WebviewWindowBuilder,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -14,6 +14,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_notification::init())
         .setup(|app| {
             // Build tray menu
             let show_item = MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)?;
@@ -38,9 +39,14 @@ pub fn run() {
                 })
                 .on_tray_icon_event(|tray, event| {
                     if let tauri::tray::TrayIconEvent::Click { .. } = event {
-                        if let Some(window) = tray.app_handle().get_webview_window("main") {
-                            let _ = window.show();
-                            let _ = window.set_focus();
+                        if let Some(droplet) = tray.app_handle().get_webview_window("droplet") {
+                            let visible = droplet.is_visible().unwrap_or(false);
+                            if visible {
+                                let _ = droplet.hide();
+                            } else {
+                                let _ = droplet.show();
+                                let _ = droplet.set_focus();
+                            }
                         }
                     }
                 })
@@ -57,6 +63,23 @@ pub fn run() {
                     }
                 }
             });
+
+            // Floating droplet: a small, borderless, always-on-top drop target.
+            // Hidden until toggled from the tray. Shares the main bundle; the
+            // frontend renders the Droplet view based on this window's label.
+            let _droplet = WebviewWindowBuilder::new(
+                app,
+                "droplet",
+                WebviewUrl::default(),
+            )
+            .title("squish droplet")
+            .inner_size(180.0, 180.0)
+            .decorations(false)
+            .always_on_top(true)
+            .skip_taskbar(true)
+            .resizable(false)
+            .visible(false)
+            .build()?;
 
             // Probe ffmpeg/ffprobe at startup
             ffmpeg::probe_and_cache();

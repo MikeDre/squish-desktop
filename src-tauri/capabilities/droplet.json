@@ -1,11 +1,10 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "default",
-  "description": "Capability for the main window",
-  "windows": ["main"],
+  "identifier": "droplet",
+  "description": "Capability for the floating droplet window",
+  "windows": ["droplet"],
   "permissions": [
     "core:default",
-    "opener:default",
     "dialog:default",
     "notification:default"
   ]
