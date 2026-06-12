@@ -4,6 +4,7 @@ import { ImageSettings } from "./ImageSettings";
 import { AudioSettings } from "./AudioSettings";
 import { VideoSettings } from "./VideoSettings";
 import { CodeSettings } from "./CodeSettings";
+import { TargetSizeSetting } from "./TargetSizeSetting";
 import { FAMILY_META } from "../lib/families";
 import "./SettingsPanel.css";
 
@@ -81,6 +82,10 @@ export function SettingsPanel({
                   />
                   Recurse into subdirectories
                 </label>
+                <TargetSizeSetting
+                  valueBytes={settings.targetSizeBytes}
+                  onChange={(bytes) => onChange({ targetSizeBytes: bytes })}
+                />
               </div>
             )}
           </div>
