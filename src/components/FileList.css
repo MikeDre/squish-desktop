@@ -4,8 +4,6 @@
   flex-direction: column;
   overflow: hidden;
   background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur);
-  backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   box-shadow: var(--glass-highlight), var(--shadow-sm);
