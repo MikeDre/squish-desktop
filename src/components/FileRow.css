@@ -3,7 +3,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 14px;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   gap: 12px;
   transition: all var(--transition);
@@ -23,6 +24,8 @@
 
 .file-row:hover {
   background: var(--bg-card-hover);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-highlight);
 }
 
 .file-row__status-dot {
@@ -73,6 +76,7 @@
 .file-row__progress-bar {
   height: 4px;
   background: var(--bg-input);
+  border: 1px solid var(--border-light);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -102,15 +106,23 @@
 .file-row__savings {
   font-weight: 700;
   color: var(--success);
+  background: var(--success-light);
+  border: 1px solid color-mix(in srgb, var(--success), transparent 72%);
+  border-radius: 999px;
+  padding: 2px 7px;
 }
 
 .file-row__reveal-btn {
-  background: none;
-  border: none;
+  background: var(--bg-elev);
+  border: 1px solid transparent;
   color: var(--text-tertiary);
   cursor: pointer;
-  font-size: 14px;
-  padding: 4px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
   border-radius: 6px;
   opacity: 0;
   transition: all var(--transition);
@@ -124,6 +136,7 @@
   opacity: 1 !important;
   color: var(--accent);
   background: var(--accent-light);
+  border-color: var(--glass-border);
 }
 
 .file-row__error {
@@ -140,29 +153,39 @@
 .file-row__family {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  padding: 1px 6px;
+  justify-content: center;
+  width: 24px;
+  height: 22px;
+  padding: 0;
   border-radius: 999px;
   background: var(--bg-elev);
+  border: 1px solid var(--border-light);
   color: var(--text-secondary);
   margin-right: 8px;
 }
 
 .file-row__warnings {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   color: var(--warning, #d97706);
   font-size: 12px;
   margin-left: 8px;
   cursor: help;
+  background: color-mix(in srgb, var(--warning), transparent 88%);
+  border: 1px solid color-mix(in srgb, var(--warning), transparent 70%);
+  border-radius: 999px;
+  padding: 2px 7px;
 }
 
 .file-row__missing-dep {
   background: var(--accent);
   color: var(--accent-fg, white);
-  border: none;
+  border: 1px solid color-mix(in srgb, var(--accent), white 18%);
   border-radius: var(--radius-sm);
-  padding: 2px 8px;
+  padding: 4px 8px;
   font-size: 11px;
+  font-weight: 650;
   cursor: pointer;
   margin-left: 8px;
 }

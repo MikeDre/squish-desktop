@@ -63,7 +63,7 @@ describe('detectFamilyFromExtension', () => {
 });
 
 describe('FAMILY_META', () => {
-  it('has a label and icon for every family', () => {
+  it('has a label for every family', () => {
     expect(FAMILY_META.image.label).toBeTruthy();
     expect(FAMILY_META.audio.label).toBeTruthy();
     expect(FAMILY_META.video.label).toBeTruthy();

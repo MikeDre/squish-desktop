@@ -3,10 +3,12 @@
   align-items: center;
   justify-content: center;
   min-height: 180px;
-  background: var(--bg-card);
-  border: 2px dashed var(--border);
+  background: var(--glass-bg);
+  border: 2px dashed var(--glass-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--glass-highlight), var(--shadow-sm);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   transition: all var(--transition);
   cursor: default;
   user-select: none;
@@ -15,7 +17,7 @@
 .dropzone--drag-over {
   border-color: var(--accent);
   border-style: solid;
-  background: var(--accent-light);
+  background: color-mix(in srgb, var(--glass-bg-strong), var(--accent-light) 42%);
   box-shadow: var(--shadow-md), 0 0 0 3px var(--accent-glow);
   transform: scale(1.01);
 }
@@ -34,13 +36,24 @@
 }
 
 .dropzone__icon {
-  font-size: 36px;
-  opacity: 0.4;
-  transition: opacity var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  background: var(--bg-elev);
+  color: var(--accent);
+  opacity: 0.72;
+  box-shadow: var(--glass-highlight);
+  transition: opacity var(--transition), transform var(--transition), background var(--transition);
 }
 
 .dropzone--drag-over .dropzone__icon {
-  opacity: 0.8;
+  opacity: 1;
+  transform: translateY(-2px) scale(1.04);
+  background: var(--accent-light);
 }
 
 .dropzone__text {

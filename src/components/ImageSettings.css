@@ -1,20 +1,51 @@
 .image-settings { display: flex; flex-direction: column; gap: 12px; }
-.image-settings__field { display: flex; flex-direction: column; gap: 4px; }
+.image-settings__field { display: flex; flex-direction: column; gap: 6px; }
 .image-settings__row { display: flex; gap: 12px; }
 .image-settings__row .image-settings__field { flex: 1; }
 .image-settings__quality-row { display: flex; align-items: center; gap: 8px; }
-.image-settings__quality-value { font-variant-numeric: tabular-nums; min-width: 3ch; color: var(--text-secondary); }
+.image-settings__quality-value {
+  min-width: 48px;
+  padding: 4px 8px;
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  background: var(--bg-elev);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.image-settings label {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text-secondary);
+}
+
 .image-settings input[type="text"],
 .image-settings input[type="number"],
 .image-settings select {
   background: var(--bg-elev);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
-  padding: 6px 8px;
+  padding: 8px 10px;
   font-family: inherit;
   font-size: 13px;
   color: var(--text-primary);
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
 }
+
+.image-settings input:focus,
+.image-settings select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.image-settings input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
 .image-settings__hint {
   margin: 2px 0 0;
   font-size: 12px;

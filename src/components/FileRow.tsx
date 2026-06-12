@@ -1,6 +1,7 @@
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import { FAMILY_META } from "../lib/families";
 import type { FileEntry } from "../types";
+import { Icon, type IconName } from "./Icon";
 import "./FileRow.css";
 
 interface FileRowProps {
@@ -12,6 +13,13 @@ function formatBytes(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+const familyIcons: Record<NonNullable<FileEntry["family"]>, IconName> = {
+  image: "image",
+  audio: "audio",
+  video: "video",
+  code: "code",
+};
 
 export function FileRow({ file }: FileRowProps) {
   const handleReveal = async () => {
@@ -33,7 +41,7 @@ export function FileRow({ file }: FileRowProps) {
             className={`file-row__family file-row__family--${file.family}`}
             title={FAMILY_META[file.family].label}
           >
-            {FAMILY_META[file.family].icon}
+            <Icon name={familyIcons[file.family]} size={12} />
           </span>
         )}
         {file.filename}
@@ -68,7 +76,7 @@ export function FileRow({ file }: FileRowProps) {
               aria-label="Show in Finder"
               title="Show in Finder"
             >
-              ↗
+              <Icon name="externalLink" size={14} />
             </button>
           )}
           {file.warnings && file.warnings.length > 0 && (
@@ -77,7 +85,7 @@ export function FileRow({ file }: FileRowProps) {
               title={file.warnings.join('\n')}
               aria-label={`${file.warnings.length} warning${file.warnings.length === 1 ? '' : 's'}`}
             >
-              ⚠ {file.warnings.length}
+              <Icon name="warning" size={12} /> {file.warnings.length}
             </span>
           )}
         </div>
@@ -93,7 +101,7 @@ export function FileRow({ file }: FileRowProps) {
                 document.querySelector('.ffmpeg-onboarding')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              Install ffmpeg →
+              Install ffmpeg
             </button>
           )}
         </div>

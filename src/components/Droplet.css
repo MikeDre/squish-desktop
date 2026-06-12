@@ -26,12 +26,27 @@
 }
 
 .droplet__icon {
-  font-size: 40px;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffb18c;
+}
+
+.droplet--busy .droplet__icon svg {
+  animation: droplet-spin 1s linear infinite;
 }
 
 .droplet__text {
   margin: 0;
   font-size: 13px;
   opacity: 0.85;
+}
+
+@keyframes droplet-spin {
+  to { transform: rotate(360deg); }
 }

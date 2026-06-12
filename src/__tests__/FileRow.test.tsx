@@ -72,15 +72,14 @@ describe("FileRow", () => {
     expect(screen.queryByRole("button", { name: /show in finder/i })).not.toBeInTheDocument();
   });
 
-  it("renders family icon for a done file", () => {
+  it("renders family badge for a done file", () => {
     render(<FileRow file={{
       id: '1', filename: 'a.mp3', path: '/a.mp3', family: 'audio',
       status: 'done', inputBytes: 100, outputBytes: 50,
       reductionPercent: 50, outputPath: '/a-squished.mp3', durationMs: 100,
       warnings: [],
     }} />);
-    // FAMILY_META.audio.icon
-    expect(screen.getByText('♪')).toBeInTheDocument();
+    expect(screen.getByTitle('Audio')).toBeInTheDocument();
   });
 
   it("shows warnings chip when warnings present", () => {

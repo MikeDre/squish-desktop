@@ -5,6 +5,7 @@ import { migrateSettings } from "../lib/settings/migrate";
 import { buildPayload } from "../lib/buildPayload";
 import { notifyBatch } from "../lib/notify";
 import type { BatchResult } from "../types";
+import { Icon } from "./Icon";
 import "./Droplet.css";
 
 type DropletState = "idle" | "busy";
@@ -71,8 +72,10 @@ export function Droplet() {
 
   return (
     <div className={className}>
-      <div className="droplet__icon">{state === "busy" ? "⏳" : "📦"}</div>
-      <p className="droplet__text">{state === "busy" ? "Squishing…" : "Drop to squish"}</p>
+      <div className="droplet__icon">
+        <Icon name={state === "busy" ? "spinner" : "archive"} size={28} />
+      </div>
+      <p className="droplet__text">{state === "busy" ? "Squishing..." : "Drop to squish"}</p>
     </div>
   );
 }

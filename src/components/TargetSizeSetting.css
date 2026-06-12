@@ -1,17 +1,33 @@
 .target-size { display: flex; flex-direction: column; gap: 12px; }
-.target-size__field { display: flex; flex-direction: column; gap: 4px; }
+.target-size__field { display: flex; flex-direction: column; gap: 6px; }
 .target-size__row { display: flex; gap: 8px; align-items: center; }
 .target-size__row input { flex: 1; min-width: 0; }
+
+.target-size label {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text-secondary);
+}
+
 .target-size input[type="number"],
 .target-size select {
   background: var(--bg-elev);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
-  padding: 6px 8px;
+  padding: 8px 10px;
   font-family: inherit;
   font-size: 13px;
   color: var(--text-primary);
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
 }
+
+.target-size input:focus,
+.target-size select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
 .target-size__hint {
   margin: 6px 0 0;
   font-size: 12px;

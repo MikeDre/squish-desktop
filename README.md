@@ -10,7 +10,6 @@ Built with [Tauri 2](https://tauri.app) + React, powered by the same [`squish-co
 
 - [Rust](https://rustup.rs) (1.95+)
 - [Node.js](https://nodejs.org) (18+)
-- Tauri CLI: `cargo install tauri-cli --version "^2"`
 
 ### System dependencies
 
@@ -26,11 +25,15 @@ Built with [Tauri 2](https://tauri.app) + React, powered by the same [`squish-co
 
 ### Build from source
 
+Use the project-local Tauri CLI installed by `npm install`. Do not run
+`cargo tauri build`; that relies on a Cargo-installed Tauri CLI instead of the
+version locked for this project.
+
 ```bash
 git clone https://github.com/MikeDre/squish-desktop.git
 cd squish-desktop
 npm install
-cargo tauri build
+npm run tauri -- build
 ```
 
 The built app will be in `src-tauri/target/release/bundle/`.
@@ -85,10 +88,21 @@ Settings persist across sessions.
 
 ```bash
 npm install
-cargo tauri dev       # launch dev server with hot reload
+npm run tauri -- dev  # launch dev server with hot reload
 npm test              # run frontend tests
 cargo test --manifest-path src-tauri/Cargo.toml  # run Rust tests
 ```
+
+If `cargo tauri build` fails while compiling `tauri-cli` or `tauri-utils` with a
+Rust error like `conflicting implementations of trait From<...HourBase...>`, run
+the npm script instead:
+
+```bash
+npm install
+npm run tauri -- build
+```
+
+The npm script uses the `@tauri-apps/cli` version from `package-lock.json`.
 
 ## Architecture
 

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { open } from "@tauri-apps/plugin-dialog";
 import type { AppStatus } from "../types";
+import { Icon } from "./Icon";
 import "./DropZone.css";
 
 interface DropZoneProps {
@@ -72,7 +73,9 @@ export function DropZone({ status, onDrop }: DropZoneProps) {
   return (
     <div className={className}>
       <div className="dropzone__content">
-        <div className="dropzone__icon">📁</div>
+        <div className="dropzone__icon">
+          <Icon name="folder" size={36} />
+        </div>
         <p className="dropzone__text">{statusText()}</p>
         <button
           className="dropzone__browse-btn"

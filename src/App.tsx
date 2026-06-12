@@ -3,6 +3,8 @@ import { DropZone } from "./components/DropZone";
 import { FileList } from "./components/FileList";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { FfmpegOnboarding } from "./components/FfmpegOnboarding";
+import { AuroraBackdrop } from "./components/AuroraBackdrop";
+import { Icon } from "./components/Icon";
 import { useSquish } from "./hooks/useSquish";
 import { useTheme } from "./hooks/useTheme";
 import { useFfmpegStatus } from "./hooks/useFfmpegStatus";
@@ -150,6 +152,7 @@ function App() {
 
   return (
     <div className="app">
+      <AuroraBackdrop active={state.status === "processing"} />
       <div className="app__header">
         <button
           className="theme-toggle"
@@ -157,7 +160,7 @@ function App() {
           aria-label={`Theme: ${theme}`}
           title={`Theme: ${theme} (${effectiveTheme})`}
         >
-          {effectiveTheme === "dark" ? "☀" : "☾"}
+          <Icon name={effectiveTheme === "dark" ? "sun" : "moon"} size={17} />
         </button>
       </div>
       <FfmpegOnboarding

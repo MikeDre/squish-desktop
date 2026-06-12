@@ -22,12 +22,11 @@ export function detectFamilyFromExtension(filename: string): Family | null {
 
 export interface FamilyMeta {
   label: string;
-  icon: string;
 }
 
 export const FAMILY_META: Record<Family, FamilyMeta> = {
-  image: { label: 'Image', icon: '🖼' },
-  audio: { label: 'Audio', icon: '♪' },
-  video: { label: 'Video', icon: '▶' },
-  code:  { label: 'Code',  icon: '{ }' },
+  image: { label: 'Image' },
+  audio: { label: 'Audio' },
+  video: { label: 'Video' },
+  code:  { label: 'Code' },
 };

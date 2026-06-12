@@ -1,0 +1,90 @@
+.aurora-backdrop {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 16%, var(--aurora-glow-one), transparent 34%),
+    radial-gradient(circle at 78% 18%, var(--aurora-glow-two), transparent 32%),
+    radial-gradient(circle at 56% 86%, var(--aurora-glow-three), transparent 38%),
+    linear-gradient(135deg, var(--aurora-base-start), var(--aurora-base-mid) 48%, var(--aurora-base-end));
+}
+
+.aurora-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at center, black, transparent 82%);
+  opacity: 0.42;
+}
+
+.aurora-backdrop__glow {
+  position: absolute;
+  width: 44vw;
+  min-width: 320px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(54px);
+  opacity: 0.58;
+  transform: translate3d(0, 0, 0);
+}
+
+.aurora-backdrop__glow--one {
+  top: -18%;
+  left: -10%;
+  background: var(--aurora-glow-one);
+}
+
+.aurora-backdrop__glow--two {
+  top: 4%;
+  right: -14%;
+  background: var(--aurora-glow-two);
+}
+
+.aurora-backdrop__glow--three {
+  right: 18%;
+  bottom: -24%;
+  background: var(--aurora-glow-three);
+}
+
+.aurora-backdrop--active .aurora-backdrop__glow {
+  opacity: 0.82;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .aurora-backdrop__glow--one {
+    animation: aurora-drift-one 18s ease-in-out infinite alternate;
+  }
+
+  .aurora-backdrop__glow--two {
+    animation: aurora-drift-two 20s ease-in-out infinite alternate;
+  }
+
+  .aurora-backdrop__glow--three {
+    animation: aurora-drift-three 22s ease-in-out infinite alternate;
+  }
+
+  .aurora-backdrop--active .aurora-backdrop__glow {
+    animation-duration: 2.4s;
+  }
+}
+
+@keyframes aurora-drift-one {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to { transform: translate3d(8%, 5%, 0) scale(1.08); }
+}
+
+@keyframes aurora-drift-two {
+  from { transform: translate3d(4%, -3%, 0) scale(1); }
+  to { transform: translate3d(-8%, 8%, 0) scale(1.1); }
+}
+
+@keyframes aurora-drift-three {
+  from { transform: translate3d(0, 4%, 0) scale(1); }
+  to { transform: translate3d(-5%, -8%, 0) scale(1.12); }
+}

@@ -1,19 +1,22 @@
 .ffmpeg-onboarding {
-  background: var(--bg-card);
-  border: 1px solid var(--accent);
+  background: var(--glass-bg-strong);
+  border: 1px solid color-mix(in srgb, var(--accent), var(--glass-border) 40%);
   border-radius: var(--radius-md);
   padding: 14px 16px;
   margin: 12px 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  box-shadow: var(--glass-highlight), var(--shadow-sm);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 .ffmpeg-onboarding__title { margin: 0; font-size: 14px; font-weight: 600; }
-.ffmpeg-onboarding__title code { padding: 1px 4px; background: var(--bg-elev); border-radius: 3px; }
+.ffmpeg-onboarding__title code { padding: 1px 4px; background: var(--bg-elev); border: 1px solid var(--border-light); border-radius: 3px; }
 .ffmpeg-onboarding__tabs { display: flex; gap: 6px; }
 .ffmpeg-onboarding__tab {
-  background: none;
-  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   padding: 4px 10px;
   font-size: 12px;
@@ -27,6 +30,7 @@
 .ffmpeg-onboarding__cmd {
   margin: 0;
   background: var(--bg-elev);
+  border: 1px solid var(--border-light);
   padding: 8px 10px;
   border-radius: var(--radius-sm);
   font-size: 12px;

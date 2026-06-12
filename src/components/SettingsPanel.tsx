@@ -6,6 +6,7 @@ import { VideoSettings } from "./VideoSettings";
 import { CodeSettings } from "./CodeSettings";
 import { TargetSizeSetting } from "./TargetSizeSetting";
 import { FAMILY_META } from "../lib/families";
+import { Icon, type IconName } from "./Icon";
 import "./SettingsPanel.css";
 
 interface SettingsPanelProps {
@@ -16,6 +17,14 @@ interface SettingsPanelProps {
 }
 
 type SectionKey = Family | "general";
+
+const sectionIcons: Record<SectionKey, IconName> = {
+  general: "settings",
+  image: "image",
+  audio: "audio",
+  video: "video",
+  code: "code",
+};
 
 export function SettingsPanel({
   settings,
@@ -59,9 +68,9 @@ export function SettingsPanel({
         <span
           className={`settings-panel__toggle-icon${open ? " settings-panel__toggle-icon--open" : ""}`}
         >
-          ⚙
+          <Icon name="settings" size={16} />
         </span>
-        Settings
+        <span className="settings-panel__toggle-label">Settings</span>
       </button>
 
       {open && (
@@ -71,7 +80,15 @@ export function SettingsPanel({
               className="settings-panel__section-header"
               onClick={() => toggleSection("general")}
             >
-              {isOpen("general") ? "▾" : "▸"} General
+              <Icon
+                name="chevronRight"
+                size={15}
+                className={`settings-panel__chevron${isOpen("general") ? " settings-panel__chevron--open" : ""}`}
+              />
+              <span className="settings-panel__section-icon">
+                <Icon name={sectionIcons.general} size={15} />
+              </span>
+              <span>General</span>
             </button>
             {isOpen("general") && (
               <div className="settings-panel__section-body">
@@ -97,8 +114,15 @@ export function SettingsPanel({
                 className="settings-panel__section-header"
                 onClick={() => toggleSection(fam)}
               >
-                {isOpen(fam) ? "▾" : "▸"} {FAMILY_META[fam].icon}{" "}
-                {FAMILY_META[fam].label}
+                <Icon
+                  name="chevronRight"
+                  size={15}
+                  className={`settings-panel__chevron${isOpen(fam) ? " settings-panel__chevron--open" : ""}`}
+                />
+                <span className="settings-panel__section-icon">
+                  <Icon name={sectionIcons[fam]} size={15} />
+                </span>
+                <span>{FAMILY_META[fam].label}</span>
                 {queueFamilies?.has(fam) && (
                   <span className="settings-panel__badge">in batch</span>
                 )}

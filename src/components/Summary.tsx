@@ -1,5 +1,6 @@
 import type { BatchResult, Family, FamilyStats } from "../types";
 import { FAMILY_META } from "../lib/families";
+import { Icon, type IconName } from "./Icon";
 import "./Summary.css";
 
 interface SummaryProps {
@@ -23,6 +24,13 @@ function pluralLabel(fam: Family, count: number): string {
   if (fam === 'audio' || fam === 'video' || fam === 'code') return base; // mass-noun feel
   return `${base}s`;
 }
+
+const familyIcons: Record<Family, IconName> = {
+  image: "image",
+  audio: "audio",
+  video: "video",
+  code: "code",
+};
 
 export function Summary({ result }: SummaryProps) {
   const saved = result.total_input_bytes > 0
@@ -50,7 +58,7 @@ export function Summary({ result }: SummaryProps) {
         <div className="summary__families">
           {nonEmpty.map(([fam, stats]) => (
             <span key={fam} className="summary__family-pill">
-              {FAMILY_META[fam].icon} {stats.success} {pluralLabel(fam, stats.success)}
+              <Icon name={familyIcons[fam]} size={12} /> {stats.success} {pluralLabel(fam, stats.success)}
             </span>
           ))}
         </div>

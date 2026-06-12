@@ -3,11 +3,13 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
+  background: var(--glass-bg-strong);
+  border-bottom: 1px solid var(--glass-border);
   position: sticky;
   top: 0;
   z-index: 1;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 .summary__stat {
@@ -27,10 +29,14 @@
 }
 
 .summary__family-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 999px;
   background: var(--bg-elev);
+  border: 1px solid var(--border-light);
   color: var(--text-secondary);
 }
 
