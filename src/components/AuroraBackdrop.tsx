@@ -4,16 +4,16 @@ interface AuroraBackdropProps {
   active: boolean;
 }
 
-export function AuroraBackdrop({ active }: AuroraBackdropProps) {
+export function AuroraBackdrop({ active }: AuroraBackdropProps): JSX.Element {
   return (
     <div
       className={`aurora-backdrop${active ? " aurora-backdrop--active" : ""}`}
       role="presentation"
       aria-hidden="true"
     >
-      <div className="aurora-backdrop__glow aurora-backdrop__glow--one" />
-      <div className="aurora-backdrop__glow aurora-backdrop__glow--two" />
-      <div className="aurora-backdrop__glow aurora-backdrop__glow--three" />
+      <span className="aurora-backdrop__glow aurora-backdrop__glow--one" />
+      <span className="aurora-backdrop__glow aurora-backdrop__glow--two" />
+      <span className="aurora-backdrop__glow aurora-backdrop__glow--three" />
     </div>
   );
 }

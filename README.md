@@ -4,6 +4,8 @@ Super fast local image & media compression on your machine. Drag and drop files 
 
 Built with [Tauri 2](https://tauri.app) + React, powered by the same [`squish-core`](https://github.com/MikeDre/squish) compression library as the CLI.
 
+The interface uses a frosted-glass "Ember" theme — translucent panels over a warm aurora backdrop that gently animates while files compress, and respects `prefers-reduced-motion`.
+
 ## Install
 
 ### Prerequisites

@@ -14,32 +14,36 @@
   --shadow-sm: 0 8px 30px rgba(103, 52, 35, 0.08);
   --shadow-md: 0 14px 48px rgba(103, 52, 35, 0.12);
   --shadow-lg: 0 24px 70px rgba(103, 52, 35, 0.16);
-  --accent: #FF6B35;
-  --accent-hover: #E85D2C;
-  --accent-light: rgba(255, 107, 53, 0.1);
-  --accent-glow: rgba(255, 107, 53, 0.25);
+  --accent: #ff6b35;
+  --accent-hover: #e85d2c;
+  --accent-light: rgba(255, 107, 53, 0.12);
+  --accent-glow: rgba(255, 107, 53, 0.28);
   --accent-fg: #fff;
-  --success: #34C759;
-  --success-light: rgba(52, 199, 89, 0.1);
-  --error: #FF3B30;
-  --error-light: rgba(255, 59, 48, 0.1);
+  --success: #2e9e5b;
+  --success-light: rgba(46, 158, 91, 0.14);
+  --error: #e53935;
+  --error-light: rgba(229, 57, 53, 0.12);
   --warning: #b55f00;
-  --glass-bg: rgba(255, 250, 244, 0.46);
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --transition: 0.2s ease;
+
+  /* Glass surfaces */
+  --glass-bg: rgba(255, 250, 244, 0.5);
   --glass-bg-strong: rgba(255, 252, 248, 0.68);
-  --glass-border: rgba(255, 255, 255, 0.56);
-  --glass-blur: 28px;
-  --glass-blur-strong: 42px;
-  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-blur: blur(20px) saturate(150%);
+  --glass-blur-strong: blur(32px) saturate(165%);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+  /* Aurora backdrop */
   --aurora-base-start: #fff6eb;
   --aurora-base-mid: #f6d8cf;
   --aurora-base-end: #ead5f1;
   --aurora-glow-one: rgba(255, 111, 57, 0.5);
   --aurora-glow-two: rgba(197, 71, 128, 0.36);
   --aurora-glow-three: rgba(255, 174, 105, 0.48);
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --transition: 0.2s ease;
 }
 
 [data-theme="dark"] {
@@ -56,19 +60,21 @@
   --shadow-sm: 0 10px 36px rgba(0, 0, 0, 0.24);
   --shadow-md: 0 18px 58px rgba(0, 0, 0, 0.34);
   --shadow-lg: 0 28px 80px rgba(0, 0, 0, 0.45);
-  --accent: #FF7F50;
-  --accent-hover: #FF6B35;
-  --accent-light: rgba(255, 127, 80, 0.15);
-  --accent-glow: rgba(255, 127, 80, 0.3);
+  --accent: #ff7f50;
+  --accent-hover: #ff6b35;
+  --accent-light: rgba(255, 127, 80, 0.18);
+  --accent-glow: rgba(255, 127, 80, 0.35);
   --accent-fg: #1b0f12;
-  --success: #30D158;
-  --success-light: rgba(48, 209, 88, 0.15);
-  --error: #FF453A;
-  --error-light: rgba(255, 69, 58, 0.15);
+  --success: #30d158;
+  --success-light: rgba(48, 209, 88, 0.16);
+  --error: #ff453a;
+  --error-light: rgba(255, 69, 58, 0.16);
   --warning: #ffbd66;
   --glass-bg: rgba(34, 25, 34, 0.42);
   --glass-bg-strong: rgba(42, 31, 42, 0.68);
-  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-blur: blur(22px) saturate(160%);
+  --glass-blur-strong: blur(36px) saturate(175%);
   --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.18);
   --aurora-base-start: #130b14;
   --aurora-base-mid: #25132a;
@@ -124,6 +130,8 @@ body {
 
 .theme-toggle {
   background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
@@ -136,8 +144,6 @@ body {
   justify-content: center;
   transition: all var(--transition);
   box-shadow: var(--glass-highlight), var(--shadow-sm);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 .theme-toggle:hover {

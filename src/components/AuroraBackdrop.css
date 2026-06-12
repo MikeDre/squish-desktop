@@ -69,8 +69,16 @@
     animation: aurora-drift-three 22s ease-in-out infinite alternate;
   }
 
-  .aurora-backdrop--active .aurora-backdrop__glow {
-    animation-duration: 2.4s;
+  .aurora-backdrop--active .aurora-backdrop__glow--one {
+    animation: aurora-drift-one 18s ease-in-out infinite alternate, aurora-heat 2.4s ease-in-out infinite;
+  }
+
+  .aurora-backdrop--active .aurora-backdrop__glow--two {
+    animation: aurora-drift-two 20s ease-in-out infinite alternate, aurora-heat 2.4s ease-in-out infinite 0.3s;
+  }
+
+  .aurora-backdrop--active .aurora-backdrop__glow--three {
+    animation: aurora-drift-three 22s ease-in-out infinite alternate, aurora-heat 2.4s ease-in-out infinite 0.6s;
   }
 }
 
@@ -87,4 +95,9 @@
 @keyframes aurora-drift-three {
   from { transform: translate3d(0, 4%, 0) scale(1); }
   to { transform: translate3d(-5%, -8%, 0) scale(1.12); }
+}
+
+@keyframes aurora-heat {
+  0%, 100% { opacity: 0.66; }
+  55% { opacity: 0.95; }
 }

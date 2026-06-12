@@ -1,9 +1,9 @@
 import { useReducer, useCallback, useState } from "react";
+import { AuroraBackdrop } from "./components/AuroraBackdrop";
 import { DropZone } from "./components/DropZone";
 import { FileList } from "./components/FileList";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { FfmpegOnboarding } from "./components/FfmpegOnboarding";
-import { AuroraBackdrop } from "./components/AuroraBackdrop";
 import { Icon } from "./components/Icon";
 import { useSquish } from "./hooks/useSquish";
 import { useTheme } from "./hooks/useTheme";

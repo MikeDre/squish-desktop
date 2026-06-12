@@ -2,15 +2,16 @@
   background: var(--glass-bg-strong);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
-  box-shadow: var(--glass-highlight), var(--shadow-md);
-  backdrop-filter: blur(var(--glass-blur-strong));
-  -webkit-backdrop-filter: blur(var(--glass-blur-strong));
+  box-shadow: var(--glass-highlight), var(--shadow-lg);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  backdrop-filter: var(--glass-blur-strong);
   overflow: hidden;
 }
 
 .settings-panel__toggle {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
   border: none;
+  box-shadow: var(--glass-highlight), var(--shadow-sm);
   font-family: inherit;
   font-size: 14px;
   font-weight: 650;
