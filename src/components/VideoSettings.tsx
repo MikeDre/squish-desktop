@@ -5,9 +5,15 @@ interface Props {
   value: VideoSettingsType;
   onChange: (update: Partial<VideoSettingsType>) => void;
   ffmpegAvailable: boolean;
+  targetSizeActive?: boolean;
 }
 
-export function VideoSettings({ value, onChange, ffmpegAvailable }: Props) {
+export function VideoSettings({
+  value,
+  onChange,
+  ffmpegAvailable,
+  targetSizeActive = false,
+}: Props) {
   const disabled = !ffmpegAvailable;
   return (
     <div className={`video-settings${disabled ? " video-settings--disabled" : ""}`}>
@@ -34,13 +40,16 @@ export function VideoSettings({ value, onChange, ffmpegAvailable }: Props) {
           type="number"
           min={0}
           max={100}
-          disabled={disabled}
+          disabled={disabled || targetSizeActive}
           placeholder="default"
           value={value.quality ?? ""}
           onChange={(e) =>
             onChange({ quality: e.target.value === "" ? null : Number(e.target.value) })
           }
         />
+        {targetSizeActive && (
+          <p className="video-settings__hint">Controlled by target size</p>
+        )}
       </div>
       <div className="video-settings__field">
         <label htmlFor="vid-preset">Preset</label>

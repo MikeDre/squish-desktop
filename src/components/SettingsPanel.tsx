@@ -23,6 +23,7 @@ export function SettingsPanel({
   queueFamilies,
   ffmpegAvailable = true,
 }: SettingsPanelProps): JSX.Element {
+  const targetSizeActive = settings.targetSizeBytes != null;
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<Set<SectionKey>>(() => {
     const initial = new Set<SectionKey>();
@@ -107,6 +108,7 @@ export function SettingsPanel({
                   {fam === "image" && (
                     <ImageSettings
                       value={settings.image}
+                      targetSizeActive={targetSizeActive}
                       onChange={(u) =>
                         onChange({ image: { ...settings.image, ...u } })
                       }
@@ -116,6 +118,7 @@ export function SettingsPanel({
                     <AudioSettings
                       value={settings.audio}
                       ffmpegAvailable={ffmpegAvailable}
+                      targetSizeActive={targetSizeActive}
                       onChange={(u) =>
                         onChange({ audio: { ...settings.audio, ...u } })
                       }
@@ -125,6 +128,7 @@ export function SettingsPanel({
                     <VideoSettings
                       value={settings.video}
                       ffmpegAvailable={ffmpegAvailable}
+                      targetSizeActive={targetSizeActive}
                       onChange={(u) =>
                         onChange({ video: { ...settings.video, ...u } })
                       }

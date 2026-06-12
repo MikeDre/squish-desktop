@@ -15,3 +15,8 @@
   font-size: 13px;
   color: var(--text-primary);
 }
+.image-settings__hint {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
