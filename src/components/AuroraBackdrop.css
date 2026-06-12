@@ -1,0 +1,39 @@
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--aurora-base);
+}
+
+.aurora__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.85;
+}
+
+.aurora__glow--1 {
+  width: 60vw;
+  height: 50vw;
+  left: -15vw;
+  top: -12vh;
+  background: var(--aurora-glow-1);
+}
+
+.aurora__glow--2 {
+  width: 55vw;
+  height: 45vw;
+  right: -12vw;
+  top: 8vh;
+  background: var(--aurora-glow-2);
+}
+
+.aurora__glow--3 {
+  width: 65vw;
+  height: 48vw;
+  left: 20vw;
+  bottom: -20vh;
+  background: var(--aurora-glow-3);
+}
