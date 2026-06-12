@@ -116,8 +116,10 @@ body {
 /* --- Theme Toggle --- */
 
 .theme-toggle {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   cursor: pointer;
@@ -128,7 +130,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: all var(--transition);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--glass-highlight), var(--shadow-sm);
 }
 
 .theme-toggle:hover {
