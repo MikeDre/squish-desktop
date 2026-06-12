@@ -8,7 +8,7 @@ Built with [Tauri 2](https://tauri.app) + React, powered by the same [`squish-co
 
 ### Prerequisites
 
-- [Rust](https://rustup.rs) (1.77+)
+- [Rust](https://rustup.rs) (1.95+)
 - [Node.js](https://nodejs.org) (18+)
 - Tauri CLI: `cargo install tauri-cli --version "^2"`
 
@@ -48,10 +48,13 @@ That's it. Sensible defaults mean zero configuration needed.
 
 Click the gear icon to adjust:
 
-- **Quality** — 0-100 slider, or Auto for format-specific defaults
-- **Format** — convert output to PNG, JPEG, WebP, AVIF, SVG, GIF, or HEIC
+- **Quality** — 0-100 slider, or Auto for format-specific defaults (images and video)
+- **Format** — convert image output to PNG, JPEG, WebP, AVIF, SVG, GIF, or HEIC
+- **Video format** — convert video output to MP4, WebM, MOV, or MKV
+- **Audio format** — convert audio output to MP3, M4A, OGG, Opus, FLAC, WAV, or AIFF
 - **Lossless** — preserve every bit (overrides quality)
 - **Resize** — constrain output by max width and/or max height in pixels. Proportional, never upscales.
+- **Target size** — fit each image, video, and audio file under a per-file byte budget (KB/MB/GB). Quality and bitrate are chosen automatically; conflicting controls are disabled while set. Code files are unaffected.
 - **Output suffix** *(advanced)* — customize the filename suffix on compressed outputs (default `squished` produces `dog_squished.png`)
 
 Settings persist across sessions.
