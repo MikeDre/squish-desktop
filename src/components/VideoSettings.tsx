@@ -1,4 +1,5 @@
 import type { VideoSettings as VideoSettingsType } from "../types";
+import { VIDEO_FORMAT_OPTIONS } from "../types";
 import "./VideoSettings.css";
 
 interface Props {
@@ -32,6 +33,19 @@ export function VideoSettings({
           value={value.codec ?? ""}
           onChange={(e) => onChange({ codec: e.target.value || null })}
         />
+      </div>
+      <div className="video-settings__field">
+        <label htmlFor="vid-format">Output format</label>
+        <select
+          id="vid-format"
+          disabled={disabled}
+          value={value.format ?? ""}
+          onChange={(e) => onChange({ format: e.target.value || null })}
+        >
+          {VIDEO_FORMAT_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
       </div>
       <div className="video-settings__field">
         <label htmlFor="vid-quality">Quality (0–100, higher = better)</label>

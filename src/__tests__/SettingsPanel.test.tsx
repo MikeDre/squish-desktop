@@ -146,7 +146,39 @@ describe("target-size conflict handling", () => {
   it("disables audio bitrate and lossless codec options", () => {
     renderWithBudget();
     expect(screen.getByLabelText(/bitrate/i)).toBeDisabled();
-    expect(screen.getByRole("option", { name: /flac/i })).toBeDisabled();
+    expect(screen.getByRole("option", { name: /flac \(lossless\)/i })).toBeDisabled();
     expect(screen.getByRole("option", { name: /copy/i })).toBeDisabled();
+  });
+});
+
+describe("media format dropdowns", () => {
+  function renderPanel() {
+    const onChange = vi.fn();
+    render(
+      <SettingsPanel
+        settings={DEFAULT_SETTINGS}
+        onChange={onChange}
+        queueFamilies={new Set(["audio", "video"])}
+        ffmpegAvailable={true}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /settings/i }));
+    return onChange;
+  }
+
+  it("video format select emits the chosen container", () => {
+    const onChange = renderPanel();
+    fireEvent.change(screen.getByLabelText(/output format/i, { selector: "#vid-format" }), {
+      target: { value: "mkv" },
+    });
+    expect(onChange).toHaveBeenCalledWith({ video: expect.objectContaining({ format: "mkv" }) });
+  });
+
+  it("audio format select emits the chosen container", () => {
+    const onChange = renderPanel();
+    fireEvent.change(screen.getByLabelText(/output format/i, { selector: "#aud-format" }), {
+      target: { value: "aiff" },
+    });
+    expect(onChange).toHaveBeenCalledWith({ audio: expect.objectContaining({ format: "aiff" }) });
   });
 });

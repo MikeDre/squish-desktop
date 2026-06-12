@@ -1,5 +1,5 @@
 import type { AudioSettings as AudioSettingsType, AudioCodec } from "../types";
-import { AUDIO_CODEC_OPTIONS } from "../types";
+import { AUDIO_CODEC_OPTIONS, AUDIO_FORMAT_OPTIONS } from "../types";
 import "./AudioSettings.css";
 
 interface Props {
@@ -41,6 +41,19 @@ export function AudioSettings({
             >
               {o.label}
             </option>
+          ))}
+        </select>
+      </div>
+      <div className="audio-settings__field">
+        <label htmlFor="aud-format">Output format</label>
+        <select
+          id="aud-format"
+          disabled={disabled}
+          value={value.format ?? ""}
+          onChange={(e) => onChange({ format: e.target.value || null })}
+        >
+          {AUDIO_FORMAT_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
       </div>
