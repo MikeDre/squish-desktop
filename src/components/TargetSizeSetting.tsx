@@ -27,16 +27,8 @@ export function TargetSizeSetting({
   const [unit, setUnit] = useState<Unit>(() =>
     valueBytes != null ? bestFitUnit(valueBytes) : "MB",
   );
-  const [amount, setAmount] = useState<number | null>(() =>
-    valueBytes != null ? valueBytes / UNIT_BYTES[bestFitUnit(valueBytes)] : null,
-  );
 
-  const emit = (nextAmount: number | null, nextUnit: Unit): void => {
-    setAmount(nextAmount);
-    onChange(
-      nextAmount == null ? null : Math.round(nextAmount * UNIT_BYTES[nextUnit]),
-    );
-  };
+  const amount = valueBytes != null ? valueBytes / UNIT_BYTES[unit] : null;
 
   return (
     <div className="target-size">
@@ -51,17 +43,17 @@ export function TargetSizeSetting({
             placeholder="off"
             value={amount ?? ""}
             onChange={(e) =>
-              emit(e.target.value === "" ? null : Number(e.target.value), unit)
+              onChange(
+                e.target.value === ""
+                  ? null
+                  : Math.round(Number(e.target.value) * UNIT_BYTES[unit]),
+              )
             }
           />
           <select
             aria-label="Unit"
             value={unit}
-            onChange={(e) => {
-              const next = e.target.value as Unit;
-              setUnit(next);
-              if (amount != null) emit(amount, next);
-            }}
+            onChange={(e) => setUnit(e.target.value as Unit)}
           >
             <option value="KB">KB</option>
             <option value="MB">MB</option>
