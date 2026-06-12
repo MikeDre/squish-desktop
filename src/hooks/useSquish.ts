@@ -10,14 +10,15 @@ import type {
   BatchResult,
 } from "../types";
 
-// Must stay in sync with the lossless members of AudioCodec in types.ts.
-const LOSSLESS_AUDIO_CODECS = new Set(["flac", "copy"]);
+// Codecs a size budget can't drive: lossless (flac) has no bitrate dial, and
+// copy doesn't re-encode. Matches the crate's target-size rejection set.
+const BUDGET_INCOMPATIBLE_AUDIO_CODECS = new Set(["flac", "copy"]);
 
 function buildPayload(settings: Settings) {
   const budget = settings.targetSizeBytes;
   const hasBudget = budget != null;
   const audioCodec =
-    hasBudget && settings.audio.codec && LOSSLESS_AUDIO_CODECS.has(settings.audio.codec)
+    hasBudget && settings.audio.codec && BUDGET_INCOMPATIBLE_AUDIO_CODECS.has(settings.audio.codec)
       ? null
       : settings.audio.codec;
 
