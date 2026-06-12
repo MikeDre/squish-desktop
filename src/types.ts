@@ -95,13 +95,15 @@ export type AudioCodec = 'copy' | 'mp3' | 'opus' | 'aac' | 'flac' | 'vorbis';
 export interface AudioSettings {
   codec: AudioCodec | null;
   bitrateKbps: number | null;
+  format: string | null;
   suffix: string | null;
 }
 
 export interface VideoSettings {
   codec: string | null;
-  crf: number | null;
+  quality: number | null; // 0-100 dial (maps to VideoOptions.quality)
   preset: string | null;
+  format: string | null;
   suffix: string | null;
 }
 
@@ -112,6 +114,7 @@ export interface CodeSettings {
 
 export interface Settings {
   recursive: boolean;
+  targetSizeBytes: number | null;
   image: ImageSettings;
   audio: AudioSettings;
   video: VideoSettings;
@@ -153,13 +156,15 @@ export const DEFAULT_IMAGE: ImageSettings = {
 export const DEFAULT_AUDIO: AudioSettings = {
   codec: null,
   bitrateKbps: null,
+  format: null,
   suffix: null,
 };
 
 export const DEFAULT_VIDEO: VideoSettings = {
   codec: null,
-  crf: null,
+  quality: null,
   preset: null,
+  format: null,
   suffix: null,
 };
 
@@ -170,6 +175,7 @@ export const DEFAULT_CODE: CodeSettings = {
 
 export const DEFAULT_SETTINGS: Settings = {
   recursive: false,
+  targetSizeBytes: null,
   image: DEFAULT_IMAGE,
   audio: DEFAULT_AUDIO,
   video: DEFAULT_VIDEO,
@@ -185,6 +191,25 @@ export const FORMAT_OPTIONS = [
   { value: 'svg', label: 'SVG' },
   { value: 'gif', label: 'GIF' },
   { value: 'heic', label: 'HEIC' },
+] as const;
+
+export const VIDEO_FORMAT_OPTIONS = [
+  { value: '', label: 'Auto (preserve input)' },
+  { value: 'mp4', label: 'MP4' },
+  { value: 'webm', label: 'WebM' },
+  { value: 'mov', label: 'MOV' },
+  { value: 'mkv', label: 'MKV' },
+] as const;
+
+export const AUDIO_FORMAT_OPTIONS = [
+  { value: '', label: 'Auto (match codec)' },
+  { value: 'mp3', label: 'MP3' },
+  { value: 'm4a', label: 'M4A' },
+  { value: 'ogg', label: 'OGG' },
+  { value: 'opus', label: 'Opus' },
+  { value: 'flac', label: 'FLAC' },
+  { value: 'wav', label: 'WAV' },
+  { value: 'aiff', label: 'AIFF' },
 ] as const;
 
 export const AUDIO_CODEC_OPTIONS = [

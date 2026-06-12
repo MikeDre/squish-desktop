@@ -18,6 +18,7 @@ export function isValidSettings(value: unknown): value is Settings {
 export function withDefaults(partial: Settings): Settings {
   return {
     recursive: partial.recursive ?? DEFAULT_SETTINGS.recursive,
+    targetSizeBytes: partial.targetSizeBytes ?? DEFAULT_SETTINGS.targetSizeBytes,
     image: { ...DEFAULT_SETTINGS.image, ...partial.image },
     audio: { ...DEFAULT_SETTINGS.audio, ...partial.audio },
     video: { ...DEFAULT_SETTINGS.video, ...partial.video },

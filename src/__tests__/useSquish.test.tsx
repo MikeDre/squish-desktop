@@ -62,9 +62,10 @@ describe("useSquish", () => {
 
     const filledSettings: Settings = {
       recursive: true,
+      targetSizeBytes: null,
       image: { quality: 80, lossless: false, format: "webp", maxWidth: 1920, maxHeight: 1080, suffix: "min" },
-      audio: { codec: "mp3", bitrateKbps: 192, suffix: null },
-      video: { codec: null, crf: null, preset: null, suffix: null },
+      audio: { codec: "mp3", bitrateKbps: 192, format: null, suffix: null },
+      video: { codec: null, quality: null, preset: null, format: null, suffix: null },
       code: { sourceMap: false, suffix: null },
     };
 
@@ -79,6 +80,7 @@ describe("useSquish", () => {
       options: {
         recursive: true,
         force_overwrite: false,
+        target_size: null,
         image: {
           quality: 80,
           lossless: false,
@@ -90,12 +92,14 @@ describe("useSquish", () => {
         audio: {
           codec: "mp3",
           bitrate_kbps: 192,
+          format: null,
           suffix: null,
         },
         video: {
           codec: null,
-          crf: null,
+          quality: null,
           preset: null,
+          format: null,
           suffix: null,
         },
         code: {
@@ -150,5 +154,50 @@ describe("buildPayload", () => {
     expect(out.audio.codec).toBe("mp3");
     expect(out.audio.bitrate_kbps).toBe(192);
     expect(out.code.source_map).toBe(true);
+  });
+});
+
+describe("buildPayload target size and formats", () => {
+  it("sends target_size and new format fields", () => {
+    const settings: Settings = {
+      ...DEFAULT_SETTINGS,
+      targetSizeBytes: 1_000_000,
+      video: { ...DEFAULT_SETTINGS.video, quality: 80, format: "mkv" },
+      audio: { ...DEFAULT_SETTINGS.audio, format: "mp3" },
+    };
+    const p = buildPayload(settings);
+    expect(p.target_size).toBe(1_000_000);
+    expect(p.video.quality).toBeNull(); // nulled: budget controls quality
+    expect(p.video.format).toBe("mkv");
+    expect(p.audio.format).toBe("mp3");
+  });
+
+  it("nulls conflicting fields when a budget is set", () => {
+    const settings: Settings = {
+      ...DEFAULT_SETTINGS,
+      targetSizeBytes: 500_000,
+      image: { ...DEFAULT_SETTINGS.image, quality: 80, lossless: true },
+      audio: { ...DEFAULT_SETTINGS.audio, bitrateKbps: 192, codec: "flac" },
+      video: { ...DEFAULT_SETTINGS.video, quality: 90 },
+    };
+    const p = buildPayload(settings);
+    expect(p.image.quality).toBeNull();
+    expect(p.image.lossless).toBe(false);
+    expect(p.audio.bitrate_kbps).toBeNull();
+    expect(p.audio.codec).toBeNull(); // flac is lossless — incompatible with a budget
+    expect(p.video.quality).toBeNull();
+  });
+
+  it("passes fields through unchanged when no budget is set", () => {
+    const settings: Settings = {
+      ...DEFAULT_SETTINGS,
+      image: { ...DEFAULT_SETTINGS.image, quality: 80, lossless: true },
+      video: { ...DEFAULT_SETTINGS.video, quality: 90 },
+    };
+    const p = buildPayload(settings);
+    expect(p.target_size).toBeNull();
+    expect(p.image.quality).toBe(80);
+    expect(p.image.lossless).toBe(true);
+    expect(p.video.quality).toBe(90);
   });
 });

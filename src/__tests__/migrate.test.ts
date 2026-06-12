@@ -61,4 +61,19 @@ describe('migrateSettings', () => {
     expect(out).toEqual(DEFAULT_SETTINGS);
     expect(warn).toHaveBeenCalled();
   });
+
+  it('fills targetSizeBytes and new format fields with defaults on old v2 blobs', () => {
+    localStorage.setItem(
+      SETTINGS_KEY_V2,
+      JSON.stringify({
+        recursive: true,
+        image: {}, audio: {}, video: { crf: 23 }, code: {},
+      }),
+    );
+    const s = migrateSettings();
+    expect(s.targetSizeBytes).toBeNull();
+    expect(s.video.quality).toBeNull(); // legacy crf is dropped, not mapped
+    expect(s.video.format).toBeNull();
+    expect(s.audio.format).toBeNull();
+  });
 });

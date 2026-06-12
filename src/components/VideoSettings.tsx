@@ -28,17 +28,17 @@ export function VideoSettings({ value, onChange, ffmpegAvailable }: Props) {
         />
       </div>
       <div className="video-settings__field">
-        <label htmlFor="vid-crf">CRF (quality, lower = better)</label>
+        <label htmlFor="vid-quality">Quality (0–100, higher = better)</label>
         <input
-          id="vid-crf"
+          id="vid-quality"
           type="number"
           min={0}
-          max={51}
+          max={100}
           disabled={disabled}
           placeholder="default"
-          value={value.crf ?? ""}
+          value={value.quality ?? ""}
           onChange={(e) =>
-            onChange({ crf: e.target.value === "" ? null : Number(e.target.value) })
+            onChange({ quality: e.target.value === "" ? null : Number(e.target.value) })
           }
         />
       </div>
