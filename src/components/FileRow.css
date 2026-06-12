@@ -3,7 +3,11 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 14px;
-  background: transparent;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight), var(--shadow-sm);
   border-radius: var(--radius-sm);
   gap: 12px;
   transition: all var(--transition);
