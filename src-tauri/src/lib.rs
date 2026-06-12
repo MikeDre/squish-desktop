@@ -4,10 +4,11 @@ mod ffmpeg;
 mod options;
 
 use tauri::{
-    menu::{Menu, MenuItem},
+    menu::{CheckMenuItem, Menu, MenuItem},
     tray::TrayIconBuilder,
     Manager, WebviewUrl, WebviewWindowBuilder,
 };
+use tauri_plugin_autostart::ManagerExt;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -15,11 +16,24 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            None,
+        ))
         .setup(|app| {
             // Build tray menu
             let show_item = MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)?;
+            let autostart_enabled = app.autolaunch().is_enabled().unwrap_or(false);
+            let login_item = CheckMenuItem::with_id(
+                app,
+                "login",
+                "Launch at login",
+                true,
+                autostart_enabled,
+                None::<&str>,
+            )?;
             let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&show_item, &quit_item])?;
+            let menu = Menu::with_items(app, &[&show_item, &login_item, &quit_item])?;
 
             // Build tray icon
             let _tray = TrayIconBuilder::new()
@@ -30,6 +44,14 @@ pub fn run() {
                         if let Some(window) = app.get_webview_window("main") {
                             let _ = window.show();
                             let _ = window.set_focus();
+                        }
+                    }
+                    "login" => {
+                        let mgr = app.autolaunch();
+                        if mgr.is_enabled().unwrap_or(false) {
+                            let _ = mgr.disable();
+                        } else {
+                            let _ = mgr.enable();
                         }
                     }
                     "quit" => {
