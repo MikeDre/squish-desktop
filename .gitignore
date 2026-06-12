@@ -17,4 +17,8 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
-docs/.superpowers/
+
+# Local tooling & working notes
+.superpowers/
+.claude/
+docs/
