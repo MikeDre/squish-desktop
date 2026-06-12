@@ -1,14 +1,20 @@
 import type { AudioSettings as AudioSettingsType, AudioCodec } from "../types";
-import { AUDIO_CODEC_OPTIONS } from "../types";
+import { AUDIO_CODEC_OPTIONS, AUDIO_FORMAT_OPTIONS } from "../types";
 import "./AudioSettings.css";
 
 interface Props {
   value: AudioSettingsType;
   onChange: (update: Partial<AudioSettingsType>) => void;
   ffmpegAvailable: boolean;
+  targetSizeActive?: boolean;
 }
 
-export function AudioSettings({ value, onChange, ffmpegAvailable }: Props) {
+export function AudioSettings({
+  value,
+  onChange,
+  ffmpegAvailable,
+  targetSizeActive = false,
+}: Props) {
   const disabled = !ffmpegAvailable;
   return (
     <div className={`audio-settings${disabled ? " audio-settings--disabled" : ""}`}>
@@ -28,6 +34,25 @@ export function AudioSettings({ value, onChange, ffmpegAvailable }: Props) {
           }
         >
           {AUDIO_CODEC_OPTIONS.map((o) => (
+            <option
+              key={o.value}
+              value={o.value}
+              disabled={targetSizeActive && (o.value === "flac" || o.value === "copy")}
+            >
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="audio-settings__field">
+        <label htmlFor="aud-format">Output format</label>
+        <select
+          id="aud-format"
+          disabled={disabled}
+          value={value.format ?? ""}
+          onChange={(e) => onChange({ format: e.target.value || null })}
+        >
+          {AUDIO_FORMAT_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
@@ -39,13 +64,16 @@ export function AudioSettings({ value, onChange, ffmpegAvailable }: Props) {
           type="number"
           min={0}
           step={32}
-          disabled={disabled}
+          disabled={disabled || targetSizeActive}
           value={value.bitrateKbps ?? ""}
           placeholder="auto"
           onChange={(e) =>
             onChange({ bitrateKbps: e.target.value === "" ? null : Number(e.target.value) })
           }
         />
+        {targetSizeActive && (
+          <p className="audio-settings__hint">Controlled by target size</p>
+        )}
       </div>
       <div className="audio-settings__field">
         <label htmlFor="aud-suffix">Suffix</label>

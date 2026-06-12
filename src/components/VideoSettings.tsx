@@ -1,13 +1,20 @@
 import type { VideoSettings as VideoSettingsType } from "../types";
+import { VIDEO_FORMAT_OPTIONS } from "../types";
 import "./VideoSettings.css";
 
 interface Props {
   value: VideoSettingsType;
   onChange: (update: Partial<VideoSettingsType>) => void;
   ffmpegAvailable: boolean;
+  targetSizeActive?: boolean;
 }
 
-export function VideoSettings({ value, onChange, ffmpegAvailable }: Props) {
+export function VideoSettings({
+  value,
+  onChange,
+  ffmpegAvailable,
+  targetSizeActive = false,
+}: Props) {
   const disabled = !ffmpegAvailable;
   return (
     <div className={`video-settings${disabled ? " video-settings--disabled" : ""}`}>
@@ -28,19 +35,35 @@ export function VideoSettings({ value, onChange, ffmpegAvailable }: Props) {
         />
       </div>
       <div className="video-settings__field">
-        <label htmlFor="vid-crf">CRF (quality, lower = better)</label>
+        <label htmlFor="vid-format">Output format</label>
+        <select
+          id="vid-format"
+          disabled={disabled}
+          value={value.format ?? ""}
+          onChange={(e) => onChange({ format: e.target.value || null })}
+        >
+          {VIDEO_FORMAT_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      </div>
+      <div className="video-settings__field">
+        <label htmlFor="vid-quality">Quality (0–100, higher = better)</label>
         <input
-          id="vid-crf"
+          id="vid-quality"
           type="number"
           min={0}
-          max={51}
-          disabled={disabled}
+          max={100}
+          disabled={disabled || targetSizeActive}
           placeholder="default"
-          value={value.crf ?? ""}
+          value={value.quality ?? ""}
           onChange={(e) =>
-            onChange({ crf: e.target.value === "" ? null : Number(e.target.value) })
+            onChange({ quality: e.target.value === "" ? null : Number(e.target.value) })
           }
         />
+        {targetSizeActive && (
+          <p className="video-settings__hint">Controlled by target size</p>
+        )}
       </div>
       <div className="video-settings__field">
         <label htmlFor="vid-preset">Preset</label>

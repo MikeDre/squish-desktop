@@ -120,11 +120,12 @@ impl From<squish_core::SquishError> for UnifiedError {
     }
 }
 
-impl From<squish_audio::AudioError> for UnifiedError {
-    fn from(e: squish_audio::AudioError) -> Self {
-        use squish_audio::AudioError as E;
+// In v0.4.0, squish_audio::AudioError and squish_video::VideoError are both
+// `pub use` re-exports of squish_media::MediaError — a single From impl covers both.
+impl From<squish_media::MediaError> for UnifiedError {
+    fn from(e: squish_media::MediaError) -> Self {
+        use squish_media::MediaError as E;
         match e {
-            // Real field names: `name` and `install_hint` (not `tool`/`hint`)
             E::MissingDependency { name, .. } => {
                 UnifiedError::MissingDependency { tool: name }
             }
@@ -133,23 +134,14 @@ impl From<squish_audio::AudioError> for UnifiedError {
                 reason: format!("not an audio file: {}", path.display()),
             },
             E::InvalidOption { reason } => UnifiedError::Unsupported { reason },
+            E::FfmpegFailed { stderr, .. } => UnifiedError::Other(stderr),
+            E::InPlaceFormatChange { path, from, to } => UnifiedError::Unsupported {
+                reason: format!(
+                    "cannot overwrite {} in place: output format .{to} differs from input .{from}",
+                    path.display()
+                ),
+            },
             E::Io(io) => UnifiedError::Io(io.to_string()),
-            other => UnifiedError::Other(format!("{other}")),
-        }
-    }
-}
-
-impl From<squish_video::VideoError> for UnifiedError {
-    fn from(e: squish_video::VideoError) -> Self {
-        use squish_video::VideoError as E;
-        match e {
-            // Real field names: `name` and `install_hint` (not `tool`)
-            E::MissingDependency { name, .. } => {
-                UnifiedError::MissingDependency { tool: name }
-            }
-            E::UnsupportedFormat { reason, .. } => UnifiedError::Unsupported { reason },
-            E::Io(io) => UnifiedError::Io(io.to_string()),
-            other => UnifiedError::Other(format!("{other}")),
         }
     }
 }
@@ -179,14 +171,14 @@ pub fn run_one(
 ) -> Result<UnifiedResult, UnifiedError> {
     match detect_kind(path) {
         FileKind::Image => {
-            let o = opts.image.to_options(opts.force_overwrite);
+            let o = opts.image.to_options(opts.force_overwrite, opts.target_size);
             squish_core::squish_file(path, &o)
                 .map(|r| UnifiedResult {
                     input_bytes: r.input_bytes,
                     output_bytes: r.output_bytes,
                     output_path: r.output_path,
                     duration: r.duration,
-                    warnings: vec![],
+                    warnings: r.warnings,
                 })
                 .map_err(Into::into)
         }
@@ -194,13 +186,14 @@ pub fn run_one(
             if !ffmpeg_ok {
                 return Err(UnifiedError::MissingDependency { tool: "ffmpeg".into() });
             }
-            let o = opts.audio.to_options(opts.force_overwrite);
+            let o = opts.audio.to_options(opts.force_overwrite, opts.target_size);
             squish_audio::squish_audio(path, &o)
                 .map(|r| UnifiedResult {
                     input_bytes: r.input_bytes,
                     output_bytes: r.output_bytes,
                     output_path: r.output_path,
                     duration: r.duration,
+                    // Audio/video/code results carry no warnings in v0.4.0 — only SquishResult (images) does.
                     warnings: vec![],
                 })
                 .map_err(Into::into)
@@ -209,7 +202,7 @@ pub fn run_one(
             if !ffmpeg_ok {
                 return Err(UnifiedError::MissingDependency { tool: "ffmpeg".into() });
             }
-            let o = opts.video.to_options(opts.force_overwrite);
+            let o = opts.video.to_options(opts.force_overwrite, opts.target_size);
             squish_video::squish_video(path, &o)
                 .map(|r| UnifiedResult {
                     input_bytes: r.input_bytes,
@@ -252,14 +245,37 @@ mod tests {
     }
 
     #[test]
-    fn audio_missing_dep_maps_to_missing_dependency() {
-        // Real AudioError::MissingDependency fields are `name` and `install_hint`
-        let e = squish_audio::AudioError::MissingDependency {
+    fn media_missing_dep_maps_to_missing_dependency() {
+        // Exercises the unified MediaError → UnifiedError mapping introduced in v0.4.0.
+        let e = squish_media::MediaError::MissingDependency {
             name: "ffmpeg".into(),
             install_hint: String::new(),
         };
         let u: UnifiedError = e.into();
         assert!(matches!(u, UnifiedError::MissingDependency { tool } if tool == "ffmpeg"));
+    }
+
+    #[test]
+    fn media_ffmpeg_failed_maps_to_other_with_stderr() {
+        // FfmpegFailed { path, stderr } — stderr text must be preserved in UnifiedError::Other.
+        let e = squish_media::MediaError::FfmpegFailed {
+            path: std::path::PathBuf::from("/a.mp3"),
+            stderr: "codec not found".into(),
+        };
+        let u: UnifiedError = e.into();
+        assert!(matches!(u, UnifiedError::Other(ref msg) if msg == "codec not found"));
+    }
+
+    #[test]
+    fn media_in_place_format_change_maps_to_unsupported() {
+        // InPlaceFormatChange { path, from, to } — must map to UnifiedError::Unsupported.
+        let e = squish_media::MediaError::InPlaceFormatChange {
+            path: std::path::PathBuf::from("/clip.dv"),
+            from: "dv".into(),
+            to: "mp4".into(),
+        };
+        let u: UnifiedError = e.into();
+        assert!(matches!(u, UnifiedError::Unsupported { .. }));
     }
 
     #[test]

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { DEFAULT_SETTINGS } from "../types";
@@ -114,5 +114,71 @@ describe("SettingsPanel", () => {
 
     const badges = screen.queryAllByText("in batch");
     expect(badges).toHaveLength(1);
+  });
+});
+
+describe("target-size conflict handling", () => {
+  function renderWithBudget() {
+    const onChange = vi.fn();
+    render(
+      <SettingsPanel
+        settings={{ ...DEFAULT_SETTINGS, targetSizeBytes: 1_000_000 }}
+        onChange={onChange}
+        queueFamilies={new Set(["image", "audio", "video"])}
+        ffmpegAvailable={true}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /settings/i }));
+    return onChange;
+  }
+
+  it("disables image quality and lossless", () => {
+    renderWithBudget();
+    expect(screen.getByLabelText(/^quality$/i)).toBeDisabled();
+    expect(screen.getByLabelText(/lossless/i)).toBeDisabled();
+  });
+
+  it("disables video quality", () => {
+    renderWithBudget();
+    expect(screen.getByLabelText(/quality \(0–100/i)).toBeDisabled();
+  });
+
+  it("disables audio bitrate and lossless codec options", () => {
+    renderWithBudget();
+    expect(screen.getByLabelText(/bitrate/i)).toBeDisabled();
+    expect(screen.getByRole("option", { name: /flac \(lossless\)/i })).toBeDisabled();
+    expect(screen.getByRole("option", { name: /copy/i })).toBeDisabled();
+  });
+});
+
+describe("media format dropdowns", () => {
+  function renderPanel() {
+    const onChange = vi.fn();
+    render(
+      <SettingsPanel
+        settings={DEFAULT_SETTINGS}
+        onChange={onChange}
+        queueFamilies={new Set(["audio", "video"])}
+        ffmpegAvailable={true}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /settings/i }));
+    return onChange;
+  }
+
+  it("video format select emits the chosen container", () => {
+    const onChange = renderPanel();
+    fireEvent.change(screen.getByLabelText(/output format/i, { selector: "#vid-format" }), {
+      target: { value: "mkv" },
+    });
+    expect(onChange).toHaveBeenCalledWith({ video: expect.objectContaining({ format: "mkv" }) });
+  });
+
+  it("audio format select emits the chosen container", () => {
+    const onChange = renderPanel();
+    fireEvent.change(screen.getByLabelText(/output format/i, { selector: "#aud-format" }), {
+      target: { value: "aiff" },
+    });
+    expect(onChange).toHaveBeenCalledWith({ audio: expect.objectContaining({ format: "aiff" }) });
   });
 });
