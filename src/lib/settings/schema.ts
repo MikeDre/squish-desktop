@@ -7,6 +7,7 @@ export function isValidSettings(value: unknown): value is Settings {
   const s = value as Partial<Settings>;
   return (
     typeof s.recursive === 'boolean' &&
+    (s.targetSizeBytes === null || s.targetSizeBytes === undefined || typeof s.targetSizeBytes === 'number') &&
     typeof s.image === 'object' && s.image !== null &&
     typeof s.audio === 'object' && s.audio !== null &&
     typeof s.video === 'object' && s.video !== null &&

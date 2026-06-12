@@ -10,6 +10,7 @@ import type {
   BatchResult,
 } from "../types";
 
+// Must stay in sync with the lossless members of AudioCodec in types.ts.
 const LOSSLESS_AUDIO_CODECS = new Set(["flac", "copy"]);
 
 function buildPayload(settings: Settings) {
