@@ -8,6 +8,8 @@ use tauri::{
     tray::TrayIconBuilder,
     Manager, WebviewUrl, WebviewWindowBuilder,
 };
+#[cfg(target_os = "macos")]
+use tauri::ActivationPolicy;
 use tauri_plugin_autostart::ManagerExt;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -21,6 +23,13 @@ pub fn run() {
             None,
         ))
         .setup(|app| {
+            #[cfg(target_os = "macos")]
+            {
+                // Start as accessory; switch to Regular whenever the main window
+                // is visible so Cmd-Tab and the Dock behave normally.
+                let _ = app.set_activation_policy(ActivationPolicy::Accessory);
+            }
+
             // Build tray menu
             let show_item = MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)?;
             let autostart_enabled = app.autolaunch().is_enabled().unwrap_or(false);
@@ -42,6 +51,10 @@ pub fn run() {
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show" => {
                         if let Some(window) = app.get_webview_window("main") {
+                            #[cfg(target_os = "macos")]
+                            {
+                                let _ = app.set_activation_policy(ActivationPolicy::Regular);
+                            }
                             let _ = window.show();
                             let _ = window.set_focus();
                         }
@@ -77,11 +90,22 @@ pub fn run() {
             // Hide window on close instead of quitting
             let app_handle = app.handle().clone();
             let window = app.get_webview_window("main").unwrap();
+            #[cfg(target_os = "macos")]
+            {
+                // The main window is configured visible in tauri.conf.json, so it
+                // is shown on launch — promote to Regular here so the Dock icon is
+                // present. (setup starts as Accessory above for the window-less case.)
+                let _ = app.set_activation_policy(ActivationPolicy::Regular);
+            }
             window.on_window_event(move |event| {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                     api.prevent_close();
                     if let Some(w) = app_handle.get_webview_window("main") {
                         let _ = w.hide();
+                    }
+                    #[cfg(target_os = "macos")]
+                    {
+                        let _ = app_handle.set_activation_policy(ActivationPolicy::Accessory);
                     }
                 }
             });
