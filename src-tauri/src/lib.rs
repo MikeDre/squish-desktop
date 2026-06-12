@@ -44,11 +44,13 @@ pub fn run() {
             let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&show_item, &login_item, &quit_item])?;
 
+            let login_item_for_menu = login_item.clone();
+
             // Build tray icon
             let _tray = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .menu(&menu)
-                .on_menu_event(|app, event| match event.id.as_ref() {
+                .on_menu_event(move |app, event| match event.id.as_ref() {
                     "show" => {
                         if let Some(window) = app.get_webview_window("main") {
                             #[cfg(target_os = "macos")]
@@ -66,6 +68,9 @@ pub fn run() {
                         } else {
                             let _ = mgr.enable();
                         }
+                        // Reflect the real post-toggle state in the menu checkmark.
+                        let now_enabled = mgr.is_enabled().unwrap_or(false);
+                        let _ = login_item_for_menu.set_checked(now_enabled);
                     }
                     "quit" => {
                         app.exit(0);
