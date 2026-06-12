@@ -171,7 +171,7 @@ pub fn run_one(
 ) -> Result<UnifiedResult, UnifiedError> {
     match detect_kind(path) {
         FileKind::Image => {
-            let o = opts.image.to_options(opts.force_overwrite);
+            let o = opts.image.to_options(opts.force_overwrite, opts.target_size);
             squish_core::squish_file(path, &o)
                 .map(|r| UnifiedResult {
                     input_bytes: r.input_bytes,
@@ -186,7 +186,7 @@ pub fn run_one(
             if !ffmpeg_ok {
                 return Err(UnifiedError::MissingDependency { tool: "ffmpeg".into() });
             }
-            let o = opts.audio.to_options(opts.force_overwrite);
+            let o = opts.audio.to_options(opts.force_overwrite, opts.target_size);
             squish_audio::squish_audio(path, &o)
                 .map(|r| UnifiedResult {
                     input_bytes: r.input_bytes,
@@ -202,7 +202,7 @@ pub fn run_one(
             if !ffmpeg_ok {
                 return Err(UnifiedError::MissingDependency { tool: "ffmpeg".into() });
             }
-            let o = opts.video.to_options(opts.force_overwrite);
+            let o = opts.video.to_options(opts.force_overwrite, opts.target_size);
             squish_video::squish_video(path, &o)
                 .map(|r| UnifiedResult {
                     input_bytes: r.input_bytes,
