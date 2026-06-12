@@ -1,7 +1,10 @@
 .ffmpeg-onboarding {
-  background: var(--bg-card);
-  border: 1px solid var(--accent);
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
+  box-shadow: var(--glass-highlight), var(--shadow-md);
   padding: 14px 16px;
   margin: 12px 0;
   display: flex;

@@ -1,0 +1,66 @@
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--aurora-base);
+}
+
+.aurora__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.85;
+}
+
+.aurora__glow--1 {
+  width: 60vw;
+  height: 50vw;
+  left: -15vw;
+  top: -12vh;
+  background: var(--aurora-glow-1);
+}
+
+.aurora__glow--2 {
+  width: 55vw;
+  height: 45vw;
+  right: -12vw;
+  top: 8vh;
+  background: var(--aurora-glow-2);
+}
+
+.aurora__glow--3 {
+  width: 65vw;
+  height: 48vw;
+  left: 20vw;
+  bottom: -20vh;
+  background: var(--aurora-glow-3);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .aurora__glow--1 { animation: aurora-drift-1 19s ease-in-out infinite alternate; }
+  .aurora__glow--2 { animation: aurora-drift-2 23s ease-in-out infinite alternate; }
+  .aurora__glow--3 { animation: aurora-drift-3 17s ease-in-out infinite alternate; }
+
+  .aurora--active .aurora__glow--1 { animation: aurora-drift-1 19s ease-in-out infinite alternate, aurora-heat 2.4s ease-in-out infinite; }
+  .aurora--active .aurora__glow--2 { animation: aurora-drift-2 23s ease-in-out infinite alternate, aurora-heat 2.4s ease-in-out infinite 0.3s; }
+  .aurora--active .aurora__glow--3 { animation: aurora-drift-3 17s ease-in-out infinite alternate, aurora-heat 2.4s ease-in-out infinite 0.6s; }
+
+  @keyframes aurora-drift-1 {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(6vw, 4vh) scale(1.15); }
+  }
+  @keyframes aurora-drift-2 {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(-5vw, 5vh) scale(0.92); }
+  }
+  @keyframes aurora-drift-3 {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(4vw, -4vh) scale(1.12); }
+  }
+  @keyframes aurora-heat {
+    0%, 100% { opacity: 0.78; }
+    55%      { opacity: 1; }
+  }
+}

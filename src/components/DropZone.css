@@ -3,10 +3,12 @@
   align-items: center;
   justify-content: center;
   min-height: 180px;
-  background: var(--bg-card);
-  border: 2px dashed var(--border);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 2px dashed var(--glass-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--glass-highlight), var(--shadow-md);
   transition: all var(--transition);
   cursor: default;
   user-select: none;

@@ -1,53 +1,83 @@
 /* --- Design Tokens --- */
 
 :root {
-  --bg-body: #F5F5F7;
-  --bg-card: #FFFFFF;
-  --bg-card-hover: #FAFAFA;
-  --bg-input: #F5F5F7;
-  --text-primary: #1A1A1A;
-  --text-secondary: #6B7280;
-  --text-tertiary: #9CA3AF;
-  --border: rgba(0, 0, 0, 0.06);
-  --border-light: rgba(0, 0, 0, 0.03);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.08);
+  /* Ember — light theme */
+  --bg-body: #FBF1EA;
+  --bg-card: rgba(255, 255, 255, 0.55);
+  --bg-card-hover: rgba(255, 255, 255, 0.68);
+  --bg-input: rgba(255, 255, 255, 0.5);
+  --bg-elev: rgba(255, 255, 255, 0.55);
+  --text-primary: #2A1D1A;
+  --text-secondary: #6E5A52;
+  --text-tertiary: #9A847A;
+  --border: rgba(120, 80, 60, 0.12);
+  --border-light: rgba(120, 80, 60, 0.06);
+  --shadow-sm: 0 1px 3px rgba(60, 30, 20, 0.06), 0 1px 2px rgba(60, 30, 20, 0.04);
+  --shadow-md: 0 4px 18px rgba(60, 30, 20, 0.10);
+  --shadow-lg: 0 10px 34px rgba(60, 30, 20, 0.16);
   --accent: #FF6B35;
   --accent-hover: #E85D2C;
-  --accent-light: rgba(255, 107, 53, 0.1);
-  --accent-glow: rgba(255, 107, 53, 0.25);
-  --success: #34C759;
-  --success-light: rgba(52, 199, 89, 0.1);
-  --error: #FF3B30;
-  --error-light: rgba(255, 59, 48, 0.1);
+  --accent-light: rgba(255, 107, 53, 0.12);
+  --accent-glow: rgba(255, 107, 53, 0.28);
+  --success: #2E9E5B;
+  --success-light: rgba(46, 158, 91, 0.14);
+  --error: #E53935;
+  --error-light: rgba(229, 57, 53, 0.12);
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 20px;
   --transition: 0.2s ease;
+
+  /* Glass surfaces */
+  --glass-bg: rgba(255, 255, 255, 0.5);
+  --glass-bg-strong: rgba(255, 255, 255, 0.66);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-blur: blur(20px) saturate(150%);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+  /* Aurora backdrop */
+  --aurora-base: linear-gradient(165deg, #FDF3EC 0%, #F9E7E2 55%, #FCEFE4 100%);
+  --aurora-glow-1: rgba(255, 160, 110, 0.55);
+  --aurora-glow-2: rgba(255, 120, 150, 0.40);
+  --aurora-glow-3: rgba(255, 200, 150, 0.55);
 }
 
 [data-theme="dark"] {
-  --bg-body: #1A1A1A;
-  --bg-card: #2A2A2A;
-  --bg-card-hover: #333333;
-  --bg-input: #333333;
-  --text-primary: #F0F0F0;
-  --text-secondary: #9CA3AF;
-  --text-tertiary: #6B7280;
-  --border: rgba(255, 255, 255, 0.06);
-  --border-light: rgba(255, 255, 255, 0.03);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.4);
+  /* Ember — dark theme */
+  --bg-body: #19121F;
+  --bg-card: rgba(255, 255, 255, 0.10);
+  --bg-card-hover: rgba(255, 255, 255, 0.16);
+  --bg-input: rgba(255, 255, 255, 0.10);
+  --bg-elev: rgba(255, 255, 255, 0.12);
+  --text-primary: #F6EEF0;
+  --text-secondary: #C6B2B8;
+  --text-tertiary: #8F7C84;
+  --border: rgba(255, 255, 255, 0.10);
+  --border-light: rgba(255, 255, 255, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 18px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 34px rgba(0, 0, 0, 0.5);
   --accent: #FF7F50;
   --accent-hover: #FF6B35;
-  --accent-light: rgba(255, 127, 80, 0.15);
-  --accent-glow: rgba(255, 127, 80, 0.3);
+  --accent-light: rgba(255, 127, 80, 0.18);
+  --accent-glow: rgba(255, 127, 80, 0.35);
   --success: #30D158;
-  --success-light: rgba(48, 209, 88, 0.15);
+  --success-light: rgba(48, 209, 88, 0.16);
   --error: #FF453A;
-  --error-light: rgba(255, 69, 58, 0.15);
+  --error-light: rgba(255, 69, 58, 0.16);
+
+  /* Glass surfaces */
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-bg-strong: rgba(255, 255, 255, 0.14);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-blur: blur(22px) saturate(160%);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+
+  /* Aurora backdrop */
+  --aurora-base: linear-gradient(165deg, #1C1424 0%, #2C1A2E 55%, #3A1F26 100%);
+  --aurora-glow-1: rgba(255, 107, 53, 0.55);
+  --aurora-glow-2: rgba(176, 58, 108, 0.50);
+  --aurora-glow-3: rgba(255, 140, 90, 0.38);
 }
 
 /* --- Global Reset & Base --- */
@@ -88,8 +118,10 @@ body {
 /* --- Theme Toggle --- */
 
 .theme-toggle {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   cursor: pointer;
@@ -100,7 +132,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: all var(--transition);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--glass-highlight), var(--shadow-sm);
 }
 
 .theme-toggle:hover {

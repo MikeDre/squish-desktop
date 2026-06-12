@@ -1,4 +1,5 @@
 import { useReducer, useCallback, useState } from "react";
+import { AuroraBackdrop } from "./components/AuroraBackdrop";
 import { DropZone } from "./components/DropZone";
 import { FileList } from "./components/FileList";
 import { SettingsPanel } from "./components/SettingsPanel";
@@ -150,6 +151,7 @@ function App() {
 
   return (
     <div className="app">
+      <AuroraBackdrop active={state.status === "processing"} />
       <div className="app__header">
         <button
           className="theme-toggle"

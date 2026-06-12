@@ -3,8 +3,11 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight), var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 1;
