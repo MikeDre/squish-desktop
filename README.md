@@ -44,6 +44,15 @@ The built app will be in `src-tauri/target/release/bundle/`.
 
 That's it. Sensible defaults mean zero configuration needed.
 
+### Menu-bar droplet
+
+squish lives in the menu bar. Click the tray icon to pop out a small floating
+droplet, then drag files onto it — they're compressed immediately using your
+saved settings, with a notification when done. The main window never opens.
+
+- **Launch at login** — enable from the tray menu so squish is always ready.
+- The Dock icon hides automatically when only the menu-bar icon is showing.
+
 ### Settings
 
 Click the gear icon to adjust:
