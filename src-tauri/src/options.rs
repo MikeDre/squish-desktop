@@ -1,10 +1,10 @@
 //! Per-family IPC option payloads and mappers to crate-native options.
 
 use serde::Deserialize;
-use squish_audio::{AudioCodec, AudioOptions};
+use squish_audio::{AudioCodec, AudioFormat, AudioOptions};
 use squish_code::CodeOptions;
 use squish_core::{Format, SquishOptions};
-use squish_video::VideoOptions;
+use squish_video::{VideoCodec, VideoFormat, VideoOptions};
 
 #[allow(dead_code)]
 #[derive(Deserialize, Default)]
@@ -34,15 +34,17 @@ pub struct ImageOptionsPayload {
 pub struct AudioOptionsPayload {
     pub codec: Option<String>, // "copy" | "mp3" | "opus" | "aac" | "flac" | "vorbis" | "alac"
     pub bitrate_kbps: Option<u32>,
+    pub format: Option<String>, // AudioFormat::parse input, e.g. "mp3" | "aiff"
     pub suffix: Option<String>,
 }
 
 #[allow(dead_code)]
 #[derive(Deserialize, Default)]
 pub struct VideoOptionsPayload {
-    pub codec: Option<String>,
-    pub crf: Option<u8>,
-    pub preset: Option<String>,
+    pub codec: Option<String>,   // VideoCodec::parse input, e.g. "h264" | "hevc"
+    pub quality: Option<u8>,     // 0-100 dial (NOT raw CRF)
+    pub preset: Option<String>,  // payload-only; no crate-side field yet
+    pub format: Option<String>,  // VideoFormat::parse input, e.g. "mp4" | "mkv"
     pub suffix: Option<String>,
 }
 
@@ -78,6 +80,7 @@ impl AudioOptionsPayload {
         AudioOptions {
             codec: self.codec.as_deref().and_then(AudioCodec::parse),
             bitrate_kbps: self.bitrate_kbps,
+            output_format: self.format.as_deref().and_then(AudioFormat::parse),
             force_overwrite,
             suffix: normalize_suffix(self.suffix.as_deref()),
             target_size,
@@ -88,10 +91,10 @@ impl AudioOptionsPayload {
 
 impl VideoOptionsPayload {
     pub fn to_options(&self, force_overwrite: bool, target_size: Option<u64>) -> VideoOptions {
-        // VideoOptions 0.3.0 exposes codec, fast, quality, force_overwrite, suffix.
-        // crf and preset are IPC-facing payload fields only; no matching VideoOptions
-        // fields exist yet — the spread picks up the rest via default.
         VideoOptions {
+            quality: self.quality.map(|q| q.min(100)),
+            codec: self.codec.as_deref().and_then(VideoCodec::parse),
+            output_format: self.format.as_deref().and_then(VideoFormat::parse),
             force_overwrite,
             suffix: normalize_suffix(self.suffix.as_deref()),
             target_size,
@@ -183,6 +186,48 @@ mod tests {
         assert!(ImageOptionsPayload::default().to_options(true, None).force_overwrite);
         assert!(AudioOptionsPayload::default().to_options(true, None).force_overwrite);
         assert!(CodeOptionsPayload::default().to_options(true).force_overwrite);
+    }
+
+    #[test]
+    fn video_mapper_maps_quality_codec_and_format() {
+        let p = VideoOptionsPayload {
+            quality: Some(80),
+            codec: Some("hevc".into()),
+            format: Some("mkv".into()),
+            ..Default::default()
+        };
+        let o = p.to_options(false, None);
+        assert_eq!(o.quality, Some(80));
+        assert_eq!(o.codec, Some(squish_video::VideoCodec::H265));
+        assert_eq!(o.output_format, Some(squish_video::VideoFormat::Mkv));
+    }
+
+    #[test]
+    fn video_mapper_unknown_codec_and_format_yield_none() {
+        let p = VideoOptionsPayload {
+            codec: Some("wat".into()),
+            format: Some("wat".into()),
+            ..Default::default()
+        };
+        let o = p.to_options(false, None);
+        assert_eq!(o.codec, None);
+        assert_eq!(o.output_format, None);
+    }
+
+    #[test]
+    fn audio_mapper_maps_output_format() {
+        let p = AudioOptionsPayload {
+            format: Some("aiff".into()),
+            ..Default::default()
+        };
+        let o = p.to_options(false, None);
+        assert_eq!(o.output_format, Some(squish_audio::AudioFormat::Aiff));
+
+        let p = AudioOptionsPayload {
+            format: Some("wat".into()),
+            ..Default::default()
+        };
+        assert_eq!(p.to_options(false, None).output_format, None);
     }
 
     #[test]
